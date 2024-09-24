@@ -434,8 +434,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Randomizers\CardRandomizer.cs" />
+    <Compile Include="Randomizers\Randomizer.cs" />
     <Compile Include="Randomizers\TownRandomizer.cs" />
-    <Compile Include="main.cs" />
+    <Compile Include="WildfrostArchipelago.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

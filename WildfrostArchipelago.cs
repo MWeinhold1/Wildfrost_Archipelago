@@ -4,14 +4,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Wildfrost_Archipelago.Randomizers;
 
 namespace Wildfrost_Archipelago
 {
-    public class main : WildfrostMod
+    public class WildfrostArchipelago : WildfrostMod
     {
-        public main(string modDirectory) : base(modDirectory)
-        {
-        }
+        public WildfrostArchipelago(string modDirectory) : base(modDirectory) {}
 
         public override string GUID => "mweinhold.wildfrost.archipelago";
 
@@ -23,32 +22,42 @@ namespace Wildfrost_Archipelago
 
         public static List<object> assets = new List<object>();
 
+        public static List<Randomizer> randomizers = new List<Randomizer>();
+
         private bool preLoaded = false;
         
         private void CreateModAssets()
         {
-            assets.Add(new CardDataBuilder(this).CreateItem("archifact", "Archi-fact")
-                .SetSprites("Archi-fact.png", "Archi-fact.png")
-                .WithCardType("Item")
-                .WithFlavour("Archipelago mod incoming!")
-                .WithPlayType(Card.PlayType.None)
-                );
+            Debug.LogWarning($"[{Title}] Loading Mod Assets");
 
+            CardRandomizer rando = new CardRandomizer(this);
+            rando.Randomize();
+
+            AddAssets<CardDataBuilder, CardData>();
             preLoaded = true;
         }
+
         public void UnloadFromClasses()
         {
+            Debug.LogWarning($"[{Title}] Unloading Mod Assets");
             List<CardData> cards = AddressableLoader.GetGroup<CardData>("CardData");
-            foreach (CardData card in cards)
-            {
-                cards.RemoveAllWhere((item) => item == null || item.ModAdded == this);
-            }
+            cards.RemoveAllWhere((item) => item == null || item.ModAdded == this);
         }
 
         protected override void Load()
         {
             if (!preLoaded) { CreateModAssets(); }
+            Events.OnSceneLoaded += Events_OnSceneLoaded;
             base.Load();
+        }
+
+        private void Events_OnSceneLoaded(UnityEngine.SceneManagement.Scene scene)
+        {
+            if (scene.name == "Town")
+            {
+                Debug.LogWarning($"[{Title}] Detected Town load");
+                //TODO
+            }
         }
 
         protected override void Unload()
@@ -65,28 +74,18 @@ namespace Wildfrost_Archipelago
             return assets.OfType<T>().ToList();     //Return the correct builders.
         }
 
-        //protected override void Load()
-        //{
-        //    UnityEngine.Debug.Log("[Tutorial1] Loaded!");
-        //    base.Load();
-        //    Events.OnCardDataCreated += BigBooshu;
-        //}
+        public T TryGet<T>(string name) where T : DataFile
+        {
+            T data;
+            if (typeof(StatusEffectData).IsAssignableFrom(typeof(T)))
+                data = Get<StatusEffectData>(name) as T;
+            else
+                data = Get<T>(name);
 
-        //protected override void Unload()
-        //{
-        //    base.Unload();
-        //    Events.OnCardDataCreated -= BigBooshu;
-        //}
+            if (data == null)
+                throw new Exception($"TryGet Error: Could not find a [{typeof(T).Name}] with the name [{name}] or [{Extensions.PrefixGUID(name, this)}]");
 
-        //private void BigBooshu(CardData cardData) //cardData is the CardData that was created/duplicated
-        //{
-        //    UnityEngine.Debug.Log("[Tutorial1] New CardData Created: " + cardData.name);
-        //    if (cardData.name == "Wolfie")     //Booshu's internal name is BerryPet 
-        //    {
-        //        cardData.hp = 99;                //Setting hp
-        //        cardData.damage = 99;            //Setting damage
-        //        UnityEngine.Debug.Log("[Tutorial1] Wolfie!");
-        //    }
-        //}
+            return data;
+        }
     }
 }
