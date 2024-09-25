@@ -34,6 +34,9 @@
     <Reference Include="0Harmony">
       <HintPath>E:\SteamLibrary\steamapps\common\Wildfrost\Modded\Wildfrost_Data\Managed\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="Archipelago.MultiClient.Net">
+      <HintPath>.\Archipelago.MultiClient.Net.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>E:\SteamLibrary\steamapps\common\Wildfrost\Modded\Wildfrost_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
@@ -434,11 +437,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Archipelago\SessionManager.cs" />
     <Compile Include="Randomizers\CardRandomizer.cs" />
     <Compile Include="Randomizers\Randomizer.cs" />
     <Compile Include="Randomizers\TownRandomizer.cs" />
     <Compile Include="WildfrostArchipelago.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

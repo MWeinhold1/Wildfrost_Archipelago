@@ -10,7 +10,13 @@ namespace Wildfrost_Archipelago
 {
     public class WildfrostArchipelago : WildfrostMod
     {
-        public WildfrostArchipelago(string modDirectory) : base(modDirectory) {}
+        public static WildfrostArchipelago modRef;
+        public WildfrostArchipelago(string modDirectory) : base(modDirectory)
+        {
+            modRef = this;
+        }
+
+        #region Overrides
 
         public override string GUID => "mweinhold.wildfrost.archipelago";
 
@@ -19,6 +25,18 @@ namespace Wildfrost_Archipelago
         public override string Title => "[WIP] Wildfrost Archipelago";
 
         public override string Description => "Adds Archipelago Randomizer support to Wildfrost";
+        protected override void Load()
+        {
+            if (!preLoaded) { CreateModAssets(); }
+            Events.OnSceneLoaded += Events_OnSceneLoaded;
+            base.Load();
+        }
+        protected override void Unload()
+        {
+            UnloadFromClasses();
+            base.Unload();
+        }
+        #endregion
 
         public static List<object> assets = new List<object>();
 
@@ -28,64 +46,68 @@ namespace Wildfrost_Archipelago
         
         private void CreateModAssets()
         {
-            Debug.LogWarning($"[{Title}] Loading Mod Assets");
+            Logger.Log(LogType.Info, "Loading Mod Assets");
 
             CardRandomizer rando = new CardRandomizer(this);
             rando.Randomize();
 
-            AddAssets<CardDataBuilder, CardData>();
+            Logger.Log(LogType.Info, "Finished Loading Mod Assets");
+
             preLoaded = true;
         }
 
         public void UnloadFromClasses()
         {
-            Debug.LogWarning($"[{Title}] Unloading Mod Assets");
+            Logger.Log(LogType.Info, "Unloading Mod Assets");
             List<CardData> cards = AddressableLoader.GetGroup<CardData>("CardData");
             cards.RemoveAllWhere((item) => item == null || item.ModAdded == this);
         }
 
-        protected override void Load()
-        {
-            if (!preLoaded) { CreateModAssets(); }
-            Events.OnSceneLoaded += Events_OnSceneLoaded;
-            base.Load();
-        }
 
         private void Events_OnSceneLoaded(UnityEngine.SceneManagement.Scene scene)
         {
             if (scene.name == "Town")
             {
-                Debug.LogWarning($"[{Title}] Detected Town load");
+                Logger.Log(LogType.Info, "Detected Town load");
                 //TODO
             }
         }
 
-        protected override void Unload()
-        {
-            UnloadFromClasses();
-            base.Unload();
-        }
 
         //Credits to Hopeful for this AddAssets code.
         public override List<T> AddAssets<T, Y>()   //AddAssets is called somewhere inside base.Load(). It is called multiple times, and each time T and Y are different DataFile and DataFileBuilders
         {
+            Logger.Log(LogType.Info, $"Checking for {typeof(Y).Name}s");
             if (assets.OfType<T>().Any())           //Checks if assets has any builders of the corresponding type. 
-                Debug.LogWarning($"[{Title}] adding {typeof(Y).Name}s: {assets.OfType<T>().Count()}"); //Debug statement
+                Logger.Log(LogType.Info, $"Adding {typeof(Y).Name}s: {assets.OfType<T>().Count()}"); //Debug statement
             return assets.OfType<T>().ToList();     //Return the correct builders.
         }
+    }
 
-        public T TryGet<T>(string name) where T : DataFile
+    public static class Logger
+    {
+        public static void Log(LogType type, object message)
         {
-            T data;
-            if (typeof(StatusEffectData).IsAssignableFrom(typeof(T)))
-                data = Get<StatusEffectData>(name) as T;
-            else
-                data = Get<T>(name);
-
-            if (data == null)
-                throw new Exception($"TryGet Error: Could not find a [{typeof(T).Name}] with the name [{name}] or [{Extensions.PrefixGUID(name, this)}]");
-
-            return data;
+            string titledMessage = $"[{WildfrostArchipelago.modRef.Title}] {message}";
+            switch (type)
+            {
+                case LogType.Info:
+                    Debug.Log(titledMessage);
+                    break;
+                case LogType.Warning:
+                    Debug.LogWarning(titledMessage);
+                    break;
+                case LogType.Error:
+                    Debug.LogError(titledMessage);
+                    break;
+            }
         }
+    }
+
+    public enum LogType
+    {
+        Info,
+        Warning,
+        Error
     }
 }
