@@ -14,6 +14,7 @@ namespace Wildfrost_Archipelago
         public WildfrostArchipelago(string modDirectory) : base(modDirectory)
         {
             modRef = this;
+            rando = new CardRandomizer(this);
         }
 
         #region Overrides
@@ -31,6 +32,7 @@ namespace Wildfrost_Archipelago
             Events.OnSceneLoaded += Events_OnSceneLoaded;
             base.Load();
         }
+
         protected override void Unload()
         {
             UnloadFromClasses();
@@ -43,13 +45,14 @@ namespace Wildfrost_Archipelago
         public static List<Randomizer> randomizers = new List<Randomizer>();
 
         private bool preLoaded = false;
-        
+
+        private CardRandomizer rando;
+
         private void CreateModAssets()
         {
             Logger.Log(LogType.Info, "Loading Mod Assets");
 
-            CardRandomizer rando = new CardRandomizer(this);
-            rando.Randomize();
+            rando.InitializeCardAssets();
 
             Logger.Log(LogType.Info, "Finished Loading Mod Assets");
 
@@ -64,11 +67,13 @@ namespace Wildfrost_Archipelago
         }
 
 
+
         private void Events_OnSceneLoaded(UnityEngine.SceneManagement.Scene scene)
         {
-            if (scene.name == "Town")
+            if (scene.name == "Campaign")
             {
                 Logger.Log(LogType.Info, "Detected Town load");
+                rando.CheckRewardPools();
                 //TODO
             }
         }

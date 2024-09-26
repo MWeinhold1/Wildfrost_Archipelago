@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Wildfrost_Archipelago.Models;
 
 namespace Wildfrost_Archipelago.Randomizers
 {
@@ -16,21 +17,57 @@ namespace Wildfrost_Archipelago.Randomizers
             parentMod = mod;
         }
 
+        public void InitializeCardAssets()
+        {
+            int index = 0;
+            foreach(var cards in archifactPools)
+            {
+                Logger.Log(LogType.Info, $"Beginning Archifact creation for the {cards.name} group");
+                foreach (int i in Enumerable.Range(0, cards.count))
+                {
+                    Logger.Log(LogType.Info, $"Loading Archifact #{index} to the {cards.name} group");
+                    WildfrostArchipelago.assets.Add(new CardDataBuilder(parentMod).CreateItem($"{cards.name}_archifact_{i}", "Archi-fact")
+                        .SetSprites("Archi-fact.png", "Archi-fact.png")
+                        .WithCardType("Item")
+                        .WithFlavour($"{cards.name} #{i}; Archipelago check #{index}")
+                        .WithPlayType(Card.PlayType.None)
+                    );
+                    index++;
+                }
+            }
+        }
+
+        public void CheckRewardPools()
+        {
+            Logger.Log(LogType.Info, "Checking for reward pools");
+            var pools = Extensions.GetAllRewardPools();
+            foreach(var pool in pools)
+            {
+                Logger.Log(LogType.Info, $"Found the {pool.name} pool, of type {pool.type}");
+            }
+        }
+
         public override void Randomize()
         {
-            RewardPool itemPool = parentMod.GetAsset<RewardPool>("GeneralItemPool");
-            //RewardPool companionPool = parentMod.GetAsset<RewardPool>("GeneralUnitPool");
-            RewardPool snowdwellItemPool = parentMod.GetAsset<RewardPool>("BasicItemPool");
-            //RewardPool snowdwellCompanionPool = parentMod.GetAsset<RewardPool>("BasicUnitPool");
-            ReplacePoolCardsWithArchifacts(itemPool);
-            //ReplacePoolCardsWithArchifacts(companionPool);
-            if (snowdwellItemPool == null)
+            Logger.Log(LogType.Info, "Starting item swapping");
+            foreach (var poolName in itemPools)
             {
-                Logger.Log(LogType.Info, "Null Pool!");
+                var pool = parentMod.GetAsset<RewardPool>(poolName);
+                if (pool == null)
+                {
+                    Logger.Log(LogType.Info, $"Couldn't find the {poolName} pool");
+                    continue;
+                }
+                else if (pool.type == "Items")
+                {
+                    Logger.Log(LogType.Info, $"Updating the {poolName} pool");
+                    ReplacePoolCardsWithArchifacts(pool);
+                }
+                else
+                {
+                    Logger.Log(LogType.Info, $"Skipping the {poolName} pool, type is {pool.type}");
+                }
             }
-            ReplacePoolCardsWithArchifacts(snowdwellItemPool);
-            //ReplacePoolCardsWithArchifacts(snowdwellCompanionPool);
-
             Logger.Log(LogType.Info, "Completed item swapping");
 
             //try
@@ -84,5 +121,37 @@ namespace Wildfrost_Archipelago.Randomizers
                 Logger.Log(LogType.Warning, $"ERROR: {e}");
             }
         }
+
+        private List<ArchifactCardPool> archifactPools = new List<ArchifactCardPool>
+        {
+            new ArchifactCardPool("Clunk_Clunker", 10, RewardPool.Type.Items),
+            new ArchifactCardPool("Clunk_Item", 20, RewardPool.Type.Items),
+            new ArchifactCardPool("Generic_Clunker", 6, RewardPool.Type.Items),
+            new ArchifactCardPool("Generic_Item", 16, RewardPool.Type.Items),
+            new ArchifactCardPool("Inventor_Hut", 6, RewardPool.Type.Items),
+            new ArchifactCardPool("Lumin_Vase", 3, RewardPool.Type.Items),
+            new ArchifactCardPool("Shade_Item", 22, RewardPool.Type.Items),
+            new ArchifactCardPool("Basic_Clunker", 9, RewardPool.Type.Items),
+            new ArchifactCardPool("Basic_Item", 13, RewardPool.Type.Items)
+        };
+
+        private List<string> itemPools = new List<string> {
+            "BasicCharmPool",
+            "BasicItemPool",
+            "BasicUnitPool",
+            "ClunkCharmPool",
+            "ClunkItemPool",
+            "ClunkUnitPool",
+            "GeneralCharmPool",
+            "GeneralItemPool",
+            "GeneralModifierPool",
+            "GeneralUnitPool",
+            "MagicCharmPool",
+            "MagicItemPool",
+            "MagicUnitPool",
+            "SnowCharmPool",
+            "SnowItemPool",
+            "SnowUnitPool"
+        };
     }
 }

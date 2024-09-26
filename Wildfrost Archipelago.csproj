@@ -438,6 +438,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Archipelago\SessionManager.cs" />
+    <Compile Include="Models\ArchifactCardPool.cs" />
     <Compile Include="Randomizers\CardRandomizer.cs" />
     <Compile Include="Randomizers\Randomizer.cs" />
     <Compile Include="Randomizers\TownRandomizer.cs" />
