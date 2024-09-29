@@ -14,8 +14,9 @@ namespace Wildfrost_Archipelago.Archipelago
         private static ArchipelagoSession session;
         private static WildfrostArchipelago parentMod;
 
-        public static void StartSession(WildfrostArchipelago mod, string uriAndPort, string slotName, string password)
+        public static LoginResult StartSession(WildfrostArchipelago mod, string uriAndPort, string slotName, string password)
         {
+            Logger.Log(LogType.Info, $"Starting connection to {uriAndPort}");
             parentMod = mod;
             LoginResult result;
 
@@ -27,19 +28,23 @@ namespace Wildfrost_Archipelago.Archipelago
                 {
                     session = null;
                     LoginFailure failure = (LoginFailure)result;
-                    //TODO - Show error message
-                    return;
+                    string errorCodeString = string.Join(", ", failure.ErrorCodes.Select(ec => ec.ToString()));
+                    Logger.Log(LogType.Warning, $"Failed to connect to archipelago: ${errorCodeString}");
+                    return failure;
+                }
+                else
+                {
+                    LoginSuccessful success = (LoginSuccessful)result;
+                    Logger.Log(LogType.Info, $"Successful connection to {uriAndPort}: Connected to slot ${success.Slot}");
+                    return success;
                 }
             }
             catch (Exception e)
             {
                 session = null;
-                Logger.Log(LogType.Info, e.ToString());
-                //TODO - Show error message
-                return;
+                Logger.Log(LogType.Error, e.ToString());
+                return new LoginFailure($"Failed to connect to archipelago due to error: {e.ToString()}");
             }
-
-            LoginSuccessful success = (LoginSuccessful)result;
         }
     }
 }

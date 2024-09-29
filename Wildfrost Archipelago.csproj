@@ -439,12 +439,16 @@
   <ItemGroup>
     <Compile Include="Archipelago\SessionManager.cs" />
     <Compile Include="Models\ArchifactCardPool.cs" />
+    <Compile Include="Models\ItemsAndChecks.cs" />
     <Compile Include="Randomizers\CardRandomizer.cs" />
     <Compile Include="Randomizers\Randomizer.cs" />
     <Compile Include="Randomizers\TownRandomizer.cs" />
     <Compile Include="WildfrostArchipelago.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Models\JSON\check.json" />
+    <None Include="Models\JSON\items.json" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

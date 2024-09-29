@@ -1,0 +1,50 @@
+﻿[
+	{
+		"id": 1,
+		"displayName": "Frostoscope",
+		"itemType": 0,
+		"progressionTier": 1
+	},
+	{
+		"id": 2,
+		"displayName": "Hot Spring",
+		"itemType": 0,
+		"progressionTier": 3
+	},
+	{
+		"id": 3,
+		"displayName": "Icebreaker Cabin",
+		"itemType": 0,
+		"progressionTier": 3
+	},
+	{
+		"id": 4,
+		"displayName": "Inventor Hut",
+		"itemType": 0,
+		"progressionTier": 3
+	},
+	{
+		"id": 5,
+		"displayName": "Pet House",
+		"itemType": 0,
+		"progressionTier": 3
+	},
+	{
+		"id": 6,
+		"displayName": "Tribe Hall",
+		"itemType": 0,
+		"progressionTier": 3
+	},
+	{
+		"id": 7,
+		"displayName": "Bom Charm",
+		"itemType": 1,
+		"progressionTier": 1
+	},
+	{
+		"id": 8,
+		"displayName": "Gear Charm",
+		"itemType": 1,
+		"progressionTier": 1
+	}
+]
