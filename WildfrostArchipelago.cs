@@ -40,6 +40,7 @@ namespace Wildfrost_Archipelago
             if (needsRandomizing && scene.name == "Town")
             {
                 cardRando.RandomizeItemPools();
+                cardRando.RandomizeCharms();
                 needsRandomizing = false;
             }
         }
@@ -63,8 +64,9 @@ namespace Wildfrost_Archipelago
         {
             Logger.Log(LogType.Info, "Loading Mod Assets");
 
-            assets.Add(AssetBuilder.GetUnitBuilder());
-            assets.Add(AssetBuilder.GetItemBuilder());
+            assets.Add(AssetManager.GetUnitBuilder());
+            assets.Add(AssetManager.GetItemBuilder());
+            assets.Add(AssetManager.GetCharmBuilder());
             cardRando = new CardRandomizer();
 
             Logger.Log(LogType.Info, "Finished Loading Mod Assets");

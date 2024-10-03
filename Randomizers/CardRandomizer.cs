@@ -33,15 +33,8 @@ namespace Wildfrost_Archipelago.Randomizers
                 var cards = pool.list.Select(data => (CardData)data);
                 foreach (var card in cards)
                 {
-                    if (card.name.StartsWith("archifact"))
-                    {
-                        Logger.Log(LogType.Info, $"Skipping {card.name} registration");
-                    }
-                    else
-                    {
-                        Logger.Log(LogType.Info, $"Registering {card.title} from {pool.name} pool");
-                        vanillaCardMap.Add(card.name, (card, pool));
-                    }
+                    Logger.Log(LogType.Info, $"Registering {card.title} from {pool.name} pool");
+                    vanillaCardMap.Add(card.name, (card, pool));
                 }
             }
             Logger.Log(LogType.Info, "Finished item pool registration");
@@ -57,11 +50,11 @@ namespace Wildfrost_Archipelago.Randomizers
                 tuple.pool.list.Remove(tuple.card);
                 if (tuple.pool.type == "Units")
                 {
-                    tuple.pool.list.Add(AssetBuilder.unitCard.Clone());
+                    tuple.pool.list.Add(AssetManager.unitCard.Clone());
                 }
                 else if (tuple.pool.type == "Items")
                 {
-                    tuple.pool.list.Add(AssetBuilder.itemCard.Clone());
+                    tuple.pool.list.Add(AssetManager.itemCard.Clone());
                 }
                 else
                 {
@@ -69,6 +62,27 @@ namespace Wildfrost_Archipelago.Randomizers
                 }
             }
             Logger.Log(LogType.Info, "Finished item pool randomization");
+        }
+
+        public void RandomizeCharms()
+        {
+            Logger.Log(LogType.Info, "Starting charm randomization");
+            var pools = Extensions.GetAllRewardPools().Where(p => p.type == "Charms");
+            Dictionary<RewardPool, int> poolItemCount = new Dictionary<RewardPool, int>(pools.Count());
+            foreach(var pool in pools)
+            {
+                Logger.Log(LogType.Info, $"{pool.name} has ${pool.list.Count} charms");
+                poolItemCount.Add(pool, pool.list.Count);
+            }
+            foreach(var kvp in poolItemCount)
+            {
+                kvp.Key.list.Clear();
+                for(int i = 0; i < kvp.Value; i++)
+                {
+                    kvp.Key.list.Add(AssetManager.charm.Clone());
+                }
+            }
+            Logger.Log(LogType.Info, "Finished charm randomization");
         }
 
         public override void Randomize()
