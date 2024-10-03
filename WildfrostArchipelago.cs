@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Wildfrost_Archipelago.Archipelago;
 using Wildfrost_Archipelago.Randomizers;
 
 namespace Wildfrost_Archipelago
@@ -28,7 +29,19 @@ namespace Wildfrost_Archipelago
         protected override void Load()
         {
             if (!preLoaded) { CreateModAssets(); }
+            Events.OnSceneLoaded += Events_OnSceneLoaded;
             base.Load();
+        }
+
+        private bool needsRandomizing = true;
+
+        private void Events_OnSceneLoaded(UnityEngine.SceneManagement.Scene scene)
+        {
+            if (needsRandomizing && scene.name == "Town")
+            {
+                cardRando.RandomizeItemPools();
+                needsRandomizing = false;
+            }
         }
 
         protected override void Unload()
@@ -44,14 +57,15 @@ namespace Wildfrost_Archipelago
 
         private bool preLoaded = false;
 
-        private CardRandomizer rando;
+        private CardRandomizer cardRando;
 
         private void CreateModAssets()
         {
             Logger.Log(LogType.Info, "Loading Mod Assets");
 
-            rando = new CardRandomizer(this);
-            rando.Randomize();
+            assets.Add(AssetBuilder.GetUnitBuilder());
+            assets.Add(AssetBuilder.GetItemBuilder());
+            cardRando = new CardRandomizer();
 
             Logger.Log(LogType.Info, "Finished Loading Mod Assets");
 
@@ -64,7 +78,6 @@ namespace Wildfrost_Archipelago
             List<CardData> cards = AddressableLoader.GetGroup<CardData>("CardData");
             cards.RemoveAllWhere((item) => item == null || item.ModAdded == this);
         }
-
 
         //Credits to Hopeful for this AddAssets code.
         public override List<T> AddAssets<T, Y>()   //AddAssets is called somewhere inside base.Load(). It is called multiple times, and each time T and Y are different DataFile and DataFileBuilders
