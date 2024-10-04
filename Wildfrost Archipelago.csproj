@@ -442,7 +442,6 @@
     <Compile Include="Models\ArchifactCardPool.cs" />
     <Compile Include="Models\ItemsAndChecks.cs" />
     <Compile Include="Randomizers\CardRandomizer.cs" />
-    <Compile Include="Randomizers\Randomizer.cs" />
     <Compile Include="Randomizers\TownRandomizer.cs" />
     <Compile Include="WildfrostArchipelago.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

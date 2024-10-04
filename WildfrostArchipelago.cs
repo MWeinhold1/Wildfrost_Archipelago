@@ -54,8 +54,6 @@ namespace Wildfrost_Archipelago
 
         public static List<object> assets = new List<object>();
 
-        public static List<Randomizer> randomizers = new List<Randomizer>();
-
         private bool preLoaded = false;
 
         private CardRandomizer cardRando;

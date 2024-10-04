@@ -7,11 +7,11 @@ using UnityEngine;
 
 namespace Wildfrost_Archipelago.Randomizers
 {
-    public class TownRandomizer : Randomizer
+    public class TownRandomizer
     {
         public TownRandomizer() { }
 
-        public override void Randomize()
+        public void Randomize()
         {
             StartAllBuildings();
         }

@@ -55,17 +55,6 @@ namespace Wildfrost_Archipelago.Archipelago
                 {
                     charm = c;
                 });
-
-
-            //return new CardDataBuilder(WildfrostArchipelago.modRef).CreateUnit($"archifact_unit", "Archi-fact")
-            //    .SetSprites("Archi-fact.png", "Archi-fact.png")
-            //    .WithCardType("Friendly")
-            //    .SetStats(null, null, 0)
-            //    .WithFlavour("Archipelago check")
-            //    .SubscribeToAfterAllBuildEvent((card) =>
-            //    {
-            //        unitCard = card;
-            //    });
         }
     }
 }

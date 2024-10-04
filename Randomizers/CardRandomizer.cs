@@ -9,13 +9,15 @@ using Wildfrost_Archipelago.Models;
 
 namespace Wildfrost_Archipelago.Randomizers
 {
-    public class CardRandomizer : Randomizer
+    public class CardRandomizer
     {
         private Dictionary<string, (CardData card, RewardPool pool)> vanillaCardMap = new Dictionary<string, (CardData, RewardPool)>();
+        private Dictionary<string, RewardPool> referenceMap = new Dictionary<string, RewardPool>();
 
         public CardRandomizer()
         {
             RegisterItemPools();
+            RegisterEvents();
         }
 
         private void RegisterItemPools()
@@ -71,7 +73,7 @@ namespace Wildfrost_Archipelago.Randomizers
             Dictionary<RewardPool, int> poolItemCount = new Dictionary<RewardPool, int>(pools.Count());
             foreach(var pool in pools)
             {
-                Logger.Log(LogType.Info, $"{pool.name} has ${pool.list.Count} charms");
+                Logger.Log(LogType.Info, $"{pool.name} has {pool.list.Count} charms");
                 poolItemCount.Add(pool, pool.list.Count);
             }
             foreach(var kvp in poolItemCount)
@@ -85,52 +87,24 @@ namespace Wildfrost_Archipelago.Randomizers
             Logger.Log(LogType.Info, "Finished charm randomization");
         }
 
-        public override void Randomize()
+        public void RegisterEvents()
         {
-            var pools = Extensions.GetAllRewardPools();
-            Logger.Log(LogType.Info, "Starting item swapping");
-            foreach (var pool in pools)
-            {
-                if (pool.type == "Items")
-                {
-                    Logger.Log(LogType.Info, $"Updating the {pool.name} pool");
-                    ReplacePoolCardsWithArchifacts(pool);
-                }
-                else
-                {
-                    Logger.Log(LogType.Info, $"Skipping the {pool.name} pool, type is {pool.type}");
-                }
-            }
-            Logger.Log(LogType.Info, "Completed item swapping");
+            Events.OnEntityEnterBackpack += Events_OnEntityEnterBackpack;
+            Events.OnUpgradeGained += Events_OnUpgradeGained;
         }
 
-        private void ReplacePoolCardsWithArchifacts(RewardPool pool)
+        private void Events_OnUpgradeGained(CardUpgradeData charm)
         {
-            Random rng = new Random();
-            try
-            {
-                Logger.Log(LogType.Info, $"Removing {pool.list.Count} items from the {pool.name} pool");
-                int cardCount = pool.list.Count;
-                pool.list.Clear();
-                Logger.Log(LogType.Info, $"{pool.name} pool now has {pool.list.Count} items");
-                foreach (var i in Enumerable.Range(0, cardCount))
-                {
-                    Logger.Log(LogType.Info, $"Loading Archifact #{i} into {pool.name}");
-                    WildfrostArchipelago.assets.Add(new CardDataBuilder(WildfrostArchipelago.modRef).CreateItem($"{pool.name}_archifact_{i}", "Archi-fact")
-                        .SetSprites("Archi-fact.png", "Archi-fact.png")
-                        .WithCardType("Item")
-                        .AddPool(pool.name)
-                        .WithFlavour($"{pool.name} Archipelago check #{i}")
-                        .WithPlayType(Card.PlayType.None)
-                        .WithValue(rng.Next(20, 70))
-                    );
-                }
-                Logger.Log(LogType.Info, $"{pool.name} pool now has {pool.list.Count} items");
-            }
-            catch (Exception e)
-            {
-                Logger.Log(LogType.Warning, $"ERROR: {e}");
-            }
+            // Works for charms
+            Logger.Log(LogType.Info, $"Charm Found: {charm.title} : {charm.name}");
+            References.PlayerData.inventory.upgrades.Remove(charm);
+        }
+
+        private void Events_OnEntityEnterBackpack(Entity arg0)
+        {
+            // Works for cards, not charms
+            Logger.Log(LogType.Info, $"Entity Entered Backpack: ({arg0.data?.title ?? "Not a card"} : {arg0.data?.name ?? "Not a card"})");
+            References.PlayerData.inventory.deck.Remove(arg0.data);
         }
     }
 }
