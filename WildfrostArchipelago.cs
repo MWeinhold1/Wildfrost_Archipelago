@@ -56,7 +56,7 @@ namespace Wildfrost_Archipelago
 
         private bool preLoaded = false;
 
-        private CardRandomizer cardRando;
+        private RewardRandomizer cardRando;
 
         private void CreateModAssets()
         {
@@ -65,7 +65,7 @@ namespace Wildfrost_Archipelago
             assets.Add(AssetManager.GetUnitBuilder());
             assets.Add(AssetManager.GetItemBuilder());
             assets.Add(AssetManager.GetCharmBuilder());
-            cardRando = new CardRandomizer();
+            cardRando = new RewardRandomizer();
 
             Logger.Log(LogType.Info, "Finished Loading Mod Assets");
 

@@ -12,12 +12,10 @@ namespace Wildfrost_Archipelago.Archipelago
     {
         private const string gameName = "Wildfrost";
         private static ArchipelagoSession session;
-        private static WildfrostArchipelago parentMod;
 
-        public static LoginResult StartSession(WildfrostArchipelago mod, string uriAndPort, string slotName, string password)
+        public static LoginResult StartSession(string uriAndPort, string slotName, string password)
         {
             Logger.Log(LogType.Info, $"Starting connection to {uriAndPort}");
-            parentMod = mod;
             LoginResult result;
 
             try
@@ -45,6 +43,13 @@ namespace Wildfrost_Archipelago.Archipelago
                 Logger.Log(LogType.Error, e.ToString());
                 return new LoginFailure($"Failed to connect to archipelago due to error: {e.ToString()}");
             }
+        }
+
+        public static void GetCurrentItems()
+        {
+            if (session == null) return;
+
+            //TODO
         }
     }
 }

@@ -13,6 +13,8 @@ namespace Wildfrost_Archipelago.Archipelago
         public static CardData unitCard { get; private set; }
         public static CardUpgradeData charm { get; private set; }
 
+        public static HashSet<VanillaDataReference> vanillaData;
+
         public static CardDataBuilder GetItemBuilder()
         {
             Logger.Log(LogType.Info, "Getting item card builder");
@@ -55,6 +57,55 @@ namespace Wildfrost_Archipelago.Archipelago
                 {
                     charm = c;
                 });
+        }
+    }
+
+    public class VanillaDataReference
+    {
+        public string internalName;
+        public int rewardPool;
+        public DataFile data;
+        public bool isInPool;
+
+        public VanillaDataReference(DataFile dataFile, RewardPool pool)
+        {
+            internalName = data.name;
+            rewardPool = poolToInt(pool);
+            data = dataFile;
+        }
+
+        private static RewardPool[] pools = null;
+
+        public static RewardPool intToPool(int id)
+        {
+            if (pools == null)
+                pools = Extensions.GetAllRewardPools().ToArray();
+
+            try
+            {
+                return pools[id];
+            }
+            catch (Exception e)
+            {
+                Logger.Log(LogType.Error, $"Error in VanillaDataReference.intToPool: {e}");
+                throw e;
+            }
+        }
+
+        public static int poolToInt(RewardPool pool)
+        {
+            if (pools == null)
+                pools = Extensions.GetAllRewardPools().ToArray();
+
+            try
+            {
+                return Array.IndexOf(pools, pool);
+            }
+            catch (Exception e)
+            {
+                Logger.Log(LogType.Error, $"Error in VanillaDataReference.poolToInt: {e}");
+                throw e;
+            }
         }
     }
 }

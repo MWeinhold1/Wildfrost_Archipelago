@@ -9,12 +9,12 @@ using Wildfrost_Archipelago.Models;
 
 namespace Wildfrost_Archipelago.Randomizers
 {
-    public class CardRandomizer
+    public class RewardRandomizer
     {
         private Dictionary<string, (CardData card, RewardPool pool)> vanillaCardMap = new Dictionary<string, (CardData, RewardPool)>();
         private Dictionary<string, RewardPool> referenceMap = new Dictionary<string, RewardPool>();
 
-        public CardRandomizer()
+        public RewardRandomizer()
         {
             RegisterItemPools();
             RegisterEvents();
@@ -97,14 +97,19 @@ namespace Wildfrost_Archipelago.Randomizers
         {
             // Works for charms
             Logger.Log(LogType.Info, $"Charm Found: {charm.title} : {charm.name}");
-            References.PlayerData.inventory.upgrades.Remove(charm);
+            if (charm.IsCharm())
+            {
+                References.PlayerData.inventory.upgrades.Remove(charm);
+            }
         }
 
-        private void Events_OnEntityEnterBackpack(Entity arg0)
+        private void Events_OnEntityEnterBackpack(Entity card)
         {
             // Works for cards, not charms
-            Logger.Log(LogType.Info, $"Entity Entered Backpack: ({arg0.data?.title ?? "Not a card"} : {arg0.data?.name ?? "Not a card"})");
-            References.PlayerData.inventory.deck.Remove(arg0.data);
+            Logger.Log(LogType.Info, $"Entity Entered Backpack: ({card.data?.title ?? "Not a card"} : {card.data?.name ?? "Not a card"})");
+            References.PlayerData.inventory.deck.Remove(card.data);
+            PromptSystem.Prompt.SetText("Programmatic Prompt");
+            PromptSystem.Create(Prompt.Anchor.Mid, 0, 0, 3, Prompt.Emote.Type.Basic, Prompt.Emote.Position.Above);
         }
     }
 }
