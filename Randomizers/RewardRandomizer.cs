@@ -5,14 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Wildfrost_Archipelago.Archipelago;
-using Wildfrost_Archipelago.Models;
 
 namespace Wildfrost_Archipelago.Randomizers
 {
     public class RewardRandomizer
     {
         private Dictionary<string, (CardData card, RewardPool pool)> vanillaCardMap = new Dictionary<string, (CardData, RewardPool)>();
-        private Dictionary<string, RewardPool> referenceMap = new Dictionary<string, RewardPool>();
 
         public RewardRandomizer()
         {

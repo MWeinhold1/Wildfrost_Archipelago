@@ -45,7 +45,9 @@ namespace Wildfrost_Archipelago.Archipelago
             }
         }
 
-        public static void GetCurrentItems()
+        public static string GetLocationName(int APID) => session.Locations.GetLocationNameFromId(APID);
+
+        public static void GetAvailableItems()
         {
             if (session == null) return;
 

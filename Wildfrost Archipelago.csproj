@@ -438,10 +438,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Archipelago\AssetManager.cs" />
+    <Compile Include="Archipelago\Constants\APLocationConstants.cs" />
+    <Compile Include="Archipelago\LocationManager.cs" />
     <Compile Include="Archipelago\SessionManager.cs" />
-    <Compile Include="Models\ArchipelagoCheck.cs" />
-    <Compile Include="Models\ArchipelagoItem.cs" />
-    <Compile Include="Randomizers\CardRandomizer.cs" />
+    <Compile Include="Randomizers\RewardRandomizer.cs" />
     <Compile Include="Randomizers\TownRandomizer.cs" />
     <Compile Include="WildfrostArchipelago.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -13,7 +13,7 @@ namespace Wildfrost_Archipelago.Archipelago
         public static CardData unitCard { get; private set; }
         public static CardUpgradeData charm { get; private set; }
 
-        public static HashSet<VanillaDataReference> vanillaData;
+        public static Dictionary<int, VanillaDataReference> vanillaData;
 
         public static CardDataBuilder GetItemBuilder()
         {
@@ -62,6 +62,7 @@ namespace Wildfrost_Archipelago.Archipelago
 
     public class VanillaDataReference
     {
+        public int APID { get; }
         public string internalName;
         public int rewardPool;
         public DataFile data;
