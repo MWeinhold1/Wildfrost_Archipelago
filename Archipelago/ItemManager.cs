@@ -1,0 +1,12 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Wildfrost_Archipelago.Archipelago
+{
+    class ItemManager
+    {
+    }
+}

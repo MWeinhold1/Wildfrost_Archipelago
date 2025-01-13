@@ -89,6 +89,7 @@ namespace Wildfrost_Archipelago.Randomizers
         {
             Events.OnEntityEnterBackpack += Events_OnEntityEnterBackpack;
             Events.OnUpgradeGained += Events_OnUpgradeGained;
+
         }
 
         private void Events_OnUpgradeGained(CardUpgradeData charm)

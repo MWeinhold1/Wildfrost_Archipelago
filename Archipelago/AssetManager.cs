@@ -45,8 +45,10 @@ namespace Wildfrost_Archipelago.Archipelago
         }
         public static CardUpgradeDataBuilder GetCharmBuilder()
         {
+            new StatusEffectDataBuilder(WildfrostArchipelago.modRef).Create("archipelago_effect")
+                .WithText("{0}");
+
             Logger.Log(LogType.Info, "Getting charm builder");
-            Random rng = new Random();
             return new CardUpgradeDataBuilder(WildfrostArchipelago.modRef).CreateCharm("archifact_charm")
                 .WithType(CardUpgradeData.Type.Charm)
                 .WithImage("Archi-fact.png")

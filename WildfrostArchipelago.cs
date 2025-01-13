@@ -87,6 +87,34 @@ namespace Wildfrost_Archipelago
                 Logger.Log(LogType.Info, $"Adding {typeof(Y).Name}s: {assets.OfType<T>().Count()}"); //Debug statement
             return assets.OfType<T>().ToList();     //Return the correct builders.
         }
+
+
+
+
+        private void DataFileReferences()
+        {
+            // Known useful
+            CardData d;
+            CardUpgradeData f;
+            GameModifierData l;
+
+            // Other unsure
+            BattleData a;
+            BossRewardData b;
+            CampaignNodeType c;
+            CardType e;
+            ChallengeListener g;
+            ChallengeData h;
+            ClassData i;
+            EyeData j;
+            GameMode k;
+            KeywordData m;
+            StatusEffectData n;
+            BuildingPlotType o;
+            BuildingType p;
+            TraitData q;
+            UnlockData r;
+        }
     }
 
     public static class Logger

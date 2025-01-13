@@ -5,15 +5,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Wildfrost_Archipelago.Archipelago.Constants;
 
 namespace Wildfrost_Archipelago.Archipelago
 {
-    public static class SessionManager
+    public class SessionManager
     {
         private const string gameName = "Wildfrost";
-        private static ArchipelagoSession session;
+        private ArchipelagoSession session;
 
-        public static LoginResult StartSession(string uriAndPort, string slotName, string password)
+        public LoginResult StartSession(string uriAndPort, string slotName, string password)
         {
             Logger.Log(LogType.Info, $"Starting connection to {uriAndPort}");
             LoginResult result;
@@ -45,13 +46,16 @@ namespace Wildfrost_Archipelago.Archipelago
             }
         }
 
-        public static string GetLocationName(int APID) => session.Locations.GetLocationNameFromId(APID);
+        public string GetLocationName(int APID) => session.Locations.GetLocationNameFromId(APID);
 
-        public static void GetAvailableItems()
+        public List<APItem> GetAllRecievedItems()
         {
-            if (session == null) return;
-
-            //TODO
+            var receivedItems = session.Items.AllItemsReceived;
+            List<APItem> apItems = new List<APItem>();
+            foreach(var item in receivedItems)
+            {
+                
+            }
         }
     }
 }
