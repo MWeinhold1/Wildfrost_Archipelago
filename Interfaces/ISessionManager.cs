@@ -10,7 +10,7 @@ namespace Wildfrost_Archipelago.Interfaces
 {
     interface ISessionManager
     {
-        LoginResult StartSession(string uriAndPort, string slotName, string password);
+        bool StartSession(string uriAndPort, string slotName, string password);
 
         void EndSession();
 
@@ -20,9 +20,9 @@ namespace Wildfrost_Archipelago.Interfaces
 
         void ReceiveItemCallback();
 
-        void GetAllRemainingLocations();
+        List<APLocation> GetAllRemainingLocations();
 
-        void SendLocationFound();
+        void SendLocationsFound(int[] locationIDs);
 
         void SendDeath();
     }

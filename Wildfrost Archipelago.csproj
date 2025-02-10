@@ -438,12 +438,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Archipelago\AssetManager.cs" />
-    <Compile Include="Archipelago\Constants\APItemConstants.cs" />
-    <Compile Include="Archipelago\Constants\APLocationConstants.cs" />
     <Compile Include="Archipelago\ItemManager.cs" />
-    <Compile Include="Archipelago\LocationManager.cs" />
-    <Compile Include="Archipelago\SessionManager.cs" />
+    <Compile Include="Constants\APItemConstants.cs" />
+    <Compile Include="Constants\APLocationConstants.cs" />
+    <Compile Include="Archipelago\OldLocationManager.cs" />
+    <Compile Include="Archipelago\MockSessionManager.cs" />
+    <Compile Include="Archipelago\APSessionManager.cs" />
+    <Compile Include="Constants\Options.cs" />
     <Compile Include="Interfaces\ISessionManager.cs" />
+    <Compile Include="Interfaces\ManagerFactory.cs" />
     <Compile Include="Randomizers\RewardRandomizer.cs" />
     <Compile Include="Randomizers\TownRandomizer.cs" />
     <Compile Include="WildfrostArchipelago.cs" />

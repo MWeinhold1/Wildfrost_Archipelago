@@ -45,25 +45,6 @@ namespace Wildfrost_Archipelago.Archipelago.Constants
 
     public static class APItemConstants
     {
-        /// <summary>
-        /// Searches the set of possible items that can be sent by the server, and returns a copy value
-        /// </summary>
-        /// <param name="APID"></param>
-        /// <returns>A copy of the item that matches the passed in ID</returns>
-        public static APItem GetItem(long APID)
-        {
-            APItemType type = (APItemType)(APID / 1000);
-            switch (type)
-            {
-                case APItemType.filler:
-                    return Filler[APID];
-                case APItemType.building:
-                    return Buildings[APID];
-                default:
-                    break;
-            }
-        }
-
         public static Dictionary<long, APItem> Filler = new Dictionary<long, APItem> { };
 
         public static Dictionary<long, APItem> Buildings = new Dictionary<long, APItem>

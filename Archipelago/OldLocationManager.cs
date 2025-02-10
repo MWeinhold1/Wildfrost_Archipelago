@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Wildfrost_Archipelago.Archipelago
 {
-    public class LocationManager
+    public class OldLocationManager
     {
         private Dictionary<LocationType, List<DataFile>> locationMap = new Dictionary<LocationType, List<DataFile>>();
 
@@ -94,11 +94,6 @@ namespace Wildfrost_Archipelago.Archipelago
         //    charmData.effects.Append()
         //}
 
-        public void CompleteLocation(int APID)
-        {
-
-        }
-
         private RewardPool LocationTypeToRewardPool(LocationType type)
         {
             var rewardPools = Extensions.GetAllRewardPools();
@@ -131,30 +126,6 @@ namespace Wildfrost_Archipelago.Archipelago
 
                 default:
                     return null;
-            }
-        }
-    }
-
-    public class APLocation
-    {
-        public int APID { get; }
-        public int localID { get; }
-        public string displayName { get; }
-        public LocationType type { get; }
-
-        public APLocation(int id)
-        {
-            
-            try
-            {
-                APID = id;
-                localID = id % 1000;
-                type = (LocationType)(id / 1000);
-                displayName = SessionManager.GetLocationName(id);
-            }
-            catch (Exception e)
-            {
-                Logger.Log(LogType.Error, $"Unable to build APLocation with ID {id}: {e.ToString()}");
             }
         }
     }

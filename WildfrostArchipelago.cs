@@ -12,6 +12,7 @@ namespace Wildfrost_Archipelago
     public class WildfrostArchipelago : WildfrostMod
     {
         public static WildfrostArchipelago modRef;
+        public static bool debugMode = false;
         public WildfrostArchipelago(string modDirectory) : base(modDirectory)
         {
             modRef = this;
