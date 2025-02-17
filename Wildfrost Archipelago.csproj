@@ -34,8 +34,8 @@
     <Reference Include="0Harmony">
       <HintPath>E:\SteamLibrary\steamapps\common\Wildfrost\Modded\Wildfrost_Data\Managed\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Archipelago.MultiClient.Net">
-      <HintPath>.\Archipelago.MultiClient.Net.dll</HintPath>
+    <Reference Include="Archipelago.MultiClient.Net, Version=6.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Archipelago.MultiClient.Net.6.5.0\lib\net45\Archipelago.MultiClient.Net.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>E:\SteamLibrary\steamapps\common\Wildfrost\Modded\Wildfrost_Data\Managed\Assembly-CSharp.dll</HintPath>
@@ -97,8 +97,8 @@
     <Reference Include="netstandard">
       <HintPath>E:\SteamLibrary\steamapps\common\Wildfrost\Modded\Wildfrost_Data\Managed\netstandard.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>E:\SteamLibrary\steamapps\common\Wildfrost\Modded\Wildfrost_Data\Managed\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Archipelago.MultiClient.Net.6.5.0\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Rewired_Core">
       <HintPath>E:\SteamLibrary\steamapps\common\Wildfrost\Modded\Wildfrost_Data\Managed\Rewired_Core.dll</HintPath>
@@ -446,11 +446,15 @@
     <Compile Include="Archipelago\APSessionManager.cs" />
     <Compile Include="Constants\Options.cs" />
     <Compile Include="Interfaces\ISessionManager.cs" />
-    <Compile Include="Interfaces\ManagerFactory.cs" />
     <Compile Include="Randomizers\RewardRandomizer.cs" />
     <Compile Include="Randomizers\TownRandomizer.cs" />
+    <Compile Include="ServiceFactory.cs" />
     <Compile Include="WildfrostArchipelago.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

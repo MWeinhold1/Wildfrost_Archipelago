@@ -8,7 +8,7 @@ using Wildfrost_Archipelago.Archipelago.Constants;
 
 namespace Wildfrost_Archipelago.Interfaces
 {
-    interface ISessionManager
+    public interface ISessionManager
     {
         bool StartSession(string uriAndPort, string slotName, string password);
 

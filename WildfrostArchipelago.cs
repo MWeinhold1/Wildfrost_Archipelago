@@ -12,7 +12,7 @@ namespace Wildfrost_Archipelago
     public class WildfrostArchipelago : WildfrostMod
     {
         public static WildfrostArchipelago modRef;
-        public static bool debugMode = false;
+        public static bool debugMode = true;
         public WildfrostArchipelago(string modDirectory) : base(modDirectory)
         {
             modRef = this;
@@ -30,7 +30,8 @@ namespace Wildfrost_Archipelago
         protected override void Load()
         {
             if (!preLoaded) { CreateModAssets(); }
-            Events.OnSceneLoaded += Events_OnSceneLoaded;
+            //ServiceFactory.Init(debugMode);
+            //Events.OnSceneLoaded += Events_OnSceneLoaded;
             base.Load();
         }
 
@@ -40,8 +41,9 @@ namespace Wildfrost_Archipelago
         {
             if (needsRandomizing && scene.name == "Town")
             {
-                cardRando.RandomizeItemPools();
-                cardRando.RandomizeCharms();
+                (ServiceFactory.GetSessionManager() as MockSessionManager).DebugInitialRandomizeTest();
+                //cardRando.RandomizeItemPools();
+                //cardRando.RandomizeCharms();
                 needsRandomizing = false;
             }
         }
@@ -63,9 +65,9 @@ namespace Wildfrost_Archipelago
         {
             Logger.Log(LogType.Info, "Loading Mod Assets");
 
-            assets.Add(AssetManager.GetUnitBuilder());
-            assets.Add(AssetManager.GetItemBuilder());
-            assets.Add(AssetManager.GetCharmBuilder());
+            //assets.Add(AssetManager.GetUnitBuilder());
+            //assets.Add(AssetManager.GetItemBuilder());
+            //assets.Add(AssetManager.GetCharmBuilder());
             cardRando = new RewardRandomizer();
 
             Logger.Log(LogType.Info, "Finished Loading Mod Assets");
