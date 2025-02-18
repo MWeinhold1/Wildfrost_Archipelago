@@ -29,9 +29,9 @@ namespace Wildfrost_Archipelago
         public override string Description => "Adds Archipelago Randomizer support to Wildfrost";
         protected override void Load()
         {
+            ServiceFactory.Init(debugMode);
             if (!preLoaded) { CreateModAssets(); }
-            //ServiceFactory.Init(debugMode);
-            //Events.OnSceneLoaded += Events_OnSceneLoaded;
+            Events.OnSceneLoaded += Events_OnSceneLoaded;
             base.Load();
         }
 
@@ -41,6 +41,7 @@ namespace Wildfrost_Archipelago
         {
             if (needsRandomizing && scene.name == "Town")
             {
+                Logger.Log(LogType.Info, "Running town loaded scripts");
                 (ServiceFactory.GetSessionManager() as MockSessionManager).DebugInitialRandomizeTest();
                 //cardRando.RandomizeItemPools();
                 //cardRando.RandomizeCharms();
@@ -65,10 +66,12 @@ namespace Wildfrost_Archipelago
         {
             Logger.Log(LogType.Info, "Loading Mod Assets");
 
-            //assets.Add(AssetManager.GetUnitBuilder());
-            //assets.Add(AssetManager.GetItemBuilder());
-            //assets.Add(AssetManager.GetCharmBuilder());
-            cardRando = new RewardRandomizer();
+            var assetManager = ServiceFactory.GetAssetManager();
+            //assets.Add(assetManager.GetCharmBuilder());
+            assets.Add(assetManager.GetUnitBuilder());
+            //assets.Add(assetManager.GetItemBuilder());
+
+            // cardRando = new RewardRandomizer();
 
             Logger.Log(LogType.Info, "Finished Loading Mod Assets");
 
@@ -94,30 +97,30 @@ namespace Wildfrost_Archipelago
 
 
 
-        private void DataFileReferences()
-        {
-            // Known useful
-            CardData d;
-            CardUpgradeData f;
-            GameModifierData l;
+        //private void DataFileReferences()
+        //{
+        //    // Known useful
+        //    CardData d;
+        //    CardUpgradeData f;
+        //    GameModifierData l;
 
-            // Other unsure
-            BattleData a;
-            BossRewardData b;
-            CampaignNodeType c;
-            CardType e;
-            ChallengeListener g;
-            ChallengeData h;
-            ClassData i;
-            EyeData j;
-            GameMode k;
-            KeywordData m;
-            StatusEffectData n;
-            BuildingPlotType o;
-            BuildingType p;
-            TraitData q;
-            UnlockData r;
-        }
+        //    // Other unsure
+        //    BattleData a;
+        //    BossRewardData b;
+        //    CampaignNodeType c;
+        //    CardType e;
+        //    ChallengeListener g;
+        //    ChallengeData h;
+        //    ClassData i;
+        //    EyeData j;
+        //    GameMode k;
+        //    KeywordData m;
+        //    StatusEffectData n;
+        //    BuildingPlotType o;
+        //    BuildingType p;
+        //    TraitData q;
+        //    UnlockData r;
+        //}
     }
 
     public static class Logger
