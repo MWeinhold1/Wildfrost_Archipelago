@@ -40,15 +40,16 @@ namespace Wildfrost_Archipelago.Archipelago
             ServiceFactory.GetAssetManager().EmptyCardRewardPools();
 
             List<APLocation> itemLocations = new List<APLocation>();
-            itemLocations.AddRange(APItemConstants.CommonItems.Values.Select(item => DebugConvertAPItemToAPLocation(item, 53000)));
-            itemLocations.AddRange(APItemConstants.SnowItems.Values.Select(item => DebugConvertAPItemToAPLocation(item, 50000)));
+            itemLocations.Add(DebugConvertAPItemToAPLocation(APItemConstants.CommonItems.Values.First(), 53000));
+            //itemLocations.AddRange(APItemConstants.CommonItems.Values.Select(item => DebugConvertAPItemToAPLocation(item, 53000)));
+            //itemLocations.AddRange(APItemConstants.SnowItems.Values.Select(item => DebugConvertAPItemToAPLocation(item, 50000)));
 
-            List<APLocation> unitLocations = new List<APLocation>();
-            unitLocations.AddRange(APItemConstants.CommonUnits.Values.Select(item => DebugConvertAPItemToAPLocation(item, 63000)));
-            unitLocations.AddRange(APItemConstants.SnowUnits.Values.Select(item => DebugConvertAPItemToAPLocation(item, 60000)));
+            //List<APLocation> unitLocations = new List<APLocation>();
+            //unitLocations.AddRange(APItemConstants.CommonUnits.Values.Select(item => DebugConvertAPItemToAPLocation(item, 63000)));
+            //unitLocations.AddRange(APItemConstants.SnowUnits.Values.Select(item => DebugConvertAPItemToAPLocation(item, 60000)));
 
             itemLocations.ForEach(ServiceFactory.GetAssetManager().AddLocationToItemRewardPool);
-            unitLocations.ForEach(ServiceFactory.GetAssetManager().AddLocationToItemRewardPool);
+            //unitLocations.ForEach(ServiceFactory.GetAssetManager().AddLocationToUnitRewardPool);
         }
 
         private static readonly Dictionary<string, object> MockOptions = new Dictionary<string, object>

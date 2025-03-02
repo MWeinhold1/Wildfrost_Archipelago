@@ -31,8 +31,51 @@ namespace Wildfrost_Archipelago
         {
             ServiceFactory.Init(debugMode);
             if (!preLoaded) { CreateModAssets(); }
-            Events.OnSceneLoaded += Events_OnSceneLoaded;
+            //Events.OnSceneLoaded += Events_OnSceneLoaded;
+            Events.OnMapNodeSelect += Events_OnMapNodeSelect;
+            Events.OnCardDataCreated += Events_OnCardDataCreated;
             base.Load();
+        }
+
+        private void Events_OnCardDataCreated(CardData card)
+        {
+            if (card.name == "mweinhold.wildfrost.archipelago.archifact_item")
+            {
+                Logger.Log(LogType.Info, "Created an Archifact card");
+                card.flavour = "Updated";
+            }
+        }
+
+        private void Events_OnMapNodeSelect(MapNode node)
+        {
+            Logger.Log(LogType.Info, node.name + ": " + node.campaignNode.name);
+
+            var characters = node.campaignNode.characters.Select(i => i.ToString()).ToList();
+            Logger.Log(LogType.Info, string.Join(", ", characters));
+
+            var data = node.campaignNode.data.Select(kvp => kvp.Key + ":" + kvp.Value.ToString());
+            Logger.Log(LogType.Info, string.Join(", ", data));
+
+            if (node.campaignNode.type is CampaignNodeTypeItem)
+            {
+                Logger.Log(LogType.Info, "a");
+                //string name = "mweinhold.wildfrost.archipelago.archifact_item";
+                List<string> names = new List<string>
+                {
+                    "Sword",
+                    "Gearhammer",
+                    "Dart"
+                };
+                Logger.Log(LogType.Info, "b");
+                var nameCollection = new SaveCollection<string>(names);
+                Logger.Log(LogType.Info, "c");
+                node.campaignNode.data["cards"] = nameCollection;
+                Logger.Log(LogType.Info, "d");
+                var temp = node.campaignNode.data.GetSaveCollection<string>("cards");
+                Logger.Log(LogType.Info, "e");
+            }
+
+            Logger.Log(LogType.Info, node.campaignNode.GetDesc());
         }
 
         private bool needsRandomizing = true;
@@ -43,8 +86,6 @@ namespace Wildfrost_Archipelago
             {
                 Logger.Log(LogType.Info, "Running town loaded scripts");
                 (ServiceFactory.GetSessionManager() as MockSessionManager).DebugInitialRandomizeTest();
-                //cardRando.RandomizeItemPools();
-                //cardRando.RandomizeCharms();
                 needsRandomizing = false;
             }
         }
@@ -68,10 +109,8 @@ namespace Wildfrost_Archipelago
 
             var assetManager = ServiceFactory.GetAssetManager();
             //assets.Add(assetManager.GetCharmBuilder());
-            assets.Add(assetManager.GetUnitBuilder());
-            //assets.Add(assetManager.GetItemBuilder());
-
-            // cardRando = new RewardRandomizer();
+            //assets.Add(assetManager.GetUnitBuilder());
+            assets.Add(assetManager.GetItemBuilder());
 
             Logger.Log(LogType.Info, "Finished Loading Mod Assets");
 

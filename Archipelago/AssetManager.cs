@@ -103,10 +103,11 @@ namespace Wildfrost_Archipelago.Archipelago
             }
 
             var newCard = itemCard.Clone();
-            newCard.name = newCard.name + ":" + location.id;
+            newCard.titleFallback = newCard.name + ":" + location.id;
             newCard.flavour = BuildFlavorText(location);
             newCard.desc = location.id.ToString();
-            pool.list.Add(newCard);
+            //pool.list.Add(newCard);
+
             Logger.Log(LogType.Info, "Added card for " + location.id.ToString() + ":" + location.unlockedItem + " to the reward pool " + pool.name);
         }
 
