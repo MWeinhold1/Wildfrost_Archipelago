@@ -1,4 +1,5 @@
 ﻿using Deadpan.Enums.Engine.Components.Modding;
+using FMOD;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace Wildfrost_Archipelago.Archipelago
         public CardData itemCard { get; private set; }
         public CardData unitCard { get; private set; }
         public CardUpgradeData charm { get; private set; }
+        public StatusEffectData effect { get; private set; }
 
         private Dictionary<string, List<(DataFile card, bool hasBeenFound)>> vanillaPoolReferences;
 
@@ -29,6 +31,10 @@ namespace Wildfrost_Archipelago.Archipelago
                 .WithValue(rng.Next(20, 70))
                 .SubscribeToAfterAllBuildEvent((card) =>
                 {
+                    card.attackEffects = new CardData.StatusEffectStacks[]
+                    {
+                        SStack("New Status Effect", 1)
+                    };
                     itemCard = card;
                 });
         }
@@ -60,6 +66,20 @@ namespace Wildfrost_Archipelago.Archipelago
                 {
                     charm = c;
                 });
+        }
+
+        public StatusEffectDataBuilder GetStatusEffectBuilder()
+        {
+            Logger.Log(LogType.Info, "Getting status effect builder");
+            return new StatusEffectDataBuilder(WildfrostArchipelago.modRef).Create<StatusEffectSendAPCheck>("New Status Effect")
+                .WithText("Test: {0}")
+                .WithTextInsert("Default Insert")
+                .WithType("");
+        }
+
+        public class StatusEffectSendAPCheck : StatusEffectInstant
+        {
+
         }
 
         public void AddLocationToItemRewardPool(APLocation location)
@@ -192,6 +212,40 @@ namespace Wildfrost_Archipelago.Archipelago
                 return "Unlock " + location.unlockedItem;
             else
                 return "Send " + location.unlockedItem + " to " + location.targetPlayerName;
+        }
+
+        public T TryGet<T>(string name) where T : DataFile
+        {
+            var mod = WildfrostArchipelago.modRef;
+
+            T data;
+            if (typeof(StatusEffectData).IsAssignableFrom(typeof(T)))
+                data = mod.Get<StatusEffectData>(name) as T;
+            else if (typeof(KeywordData).IsAssignableFrom(typeof(T)))
+                data = mod.Get<KeywordData>(name.ToLower()) as T;
+            else
+                data = mod.Get<T>(name);
+
+            if (data == null)
+                throw new Exception($"TryGet Error: Could not find a [{typeof(T).Name}] with the name [{name}] or [{Extensions.PrefixGUID(name, mod)}]");
+
+            return data;
+        }
+
+        public CardData.StatusEffectStacks SStack(string name, int amount) => new CardData.StatusEffectStacks(TryGet<StatusEffectData>(name), amount);
+        //See above
+
+        //Note: you need to add the reference DeadExtensions.dll in order to use InstantiateKeepName(). 
+        public StatusEffectDataBuilder StatusCopy(string oldName, string newName)
+        {
+            var mod = WildfrostArchipelago.modRef;
+
+            StatusEffectData data = TryGet<StatusEffectData>(oldName).InstantiateKeepName();
+            data.name = mod.GUID + "." + newName;
+            data.targetConstraints = new TargetConstraint[0];
+            StatusEffectDataBuilder builder = data.Edit<StatusEffectData, StatusEffectDataBuilder>();
+            builder.Mod = mod;
+            return builder;
         }
     }
 }

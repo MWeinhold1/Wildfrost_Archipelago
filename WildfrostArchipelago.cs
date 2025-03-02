@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Localization;
 using Wildfrost_Archipelago.Archipelago;
 using Wildfrost_Archipelago.Randomizers;
 
@@ -36,13 +37,23 @@ namespace Wildfrost_Archipelago
             Events.OnCardDataCreated += Events_OnCardDataCreated;
             base.Load();
         }
-
+        int temp = 1;
         private void Events_OnCardDataCreated(CardData card)
         {
             if (card.name == "mweinhold.wildfrost.archipelago.archifact_item")
             {
+                var assetManager = ServiceFactory.GetAssetManager();
                 Logger.Log(LogType.Info, "Created an Archifact card");
-                card.flavour = "Updated";
+                card.forceTitle = "Force Title " + temp.ToString();
+                Logger.Log(LogType.Info, "AA");
+                //card.startWithEffects = new CardData.StatusEffectStacks[]
+                //{
+                //    assetManager.SStack("Send Archifact",1)
+                //};
+                Logger.Log(LogType.Info, "BB");
+                card.attackEffects.First().data.textInsert = "New <Text>";
+                Logger.Log(LogType.Info, "CC");
+                temp++;
             }
         }
 
@@ -59,12 +70,12 @@ namespace Wildfrost_Archipelago
             if (node.campaignNode.type is CampaignNodeTypeItem)
             {
                 Logger.Log(LogType.Info, "a");
-                //string name = "mweinhold.wildfrost.archipelago.archifact_item";
+                string name = "mweinhold.wildfrost.archipelago.archifact_item";
                 List<string> names = new List<string>
                 {
-                    "Sword",
-                    "Gearhammer",
-                    "Dart"
+                    name,
+                    name,
+                    name
                 };
                 Logger.Log(LogType.Info, "b");
                 var nameCollection = new SaveCollection<string>(names);
@@ -108,6 +119,7 @@ namespace Wildfrost_Archipelago
             Logger.Log(LogType.Info, "Loading Mod Assets");
 
             var assetManager = ServiceFactory.GetAssetManager();
+            assets.Add(assetManager.GetStatusEffectBuilder());
             //assets.Add(assetManager.GetCharmBuilder());
             //assets.Add(assetManager.GetUnitBuilder());
             assets.Add(assetManager.GetItemBuilder());
