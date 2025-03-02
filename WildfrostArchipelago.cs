@@ -42,17 +42,9 @@ namespace Wildfrost_Archipelago
         {
             if (card.name == "mweinhold.wildfrost.archipelago.archifact_item")
             {
-                var assetManager = ServiceFactory.GetAssetManager();
                 Logger.Log(LogType.Info, "Created an Archifact card");
                 card.forceTitle = "Force Title " + temp.ToString();
-                Logger.Log(LogType.Info, "AA");
-                //card.startWithEffects = new CardData.StatusEffectStacks[]
-                //{
-                //    assetManager.SStack("Send Archifact",1)
-                //};
-                Logger.Log(LogType.Info, "BB");
                 card.attackEffects.First().data.textInsert = "New <Text>";
-                Logger.Log(LogType.Info, "CC");
                 temp++;
             }
         }
@@ -69,7 +61,6 @@ namespace Wildfrost_Archipelago
 
             if (node.campaignNode.type is CampaignNodeTypeItem)
             {
-                Logger.Log(LogType.Info, "a");
                 string name = "mweinhold.wildfrost.archipelago.archifact_item";
                 List<string> names = new List<string>
                 {
@@ -77,13 +68,9 @@ namespace Wildfrost_Archipelago
                     name,
                     name
                 };
-                Logger.Log(LogType.Info, "b");
                 var nameCollection = new SaveCollection<string>(names);
-                Logger.Log(LogType.Info, "c");
                 node.campaignNode.data["cards"] = nameCollection;
-                Logger.Log(LogType.Info, "d");
                 var temp = node.campaignNode.data.GetSaveCollection<string>("cards");
-                Logger.Log(LogType.Info, "e");
             }
 
             Logger.Log(LogType.Info, node.campaignNode.GetDesc());
