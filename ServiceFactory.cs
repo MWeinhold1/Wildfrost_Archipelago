@@ -11,14 +11,16 @@ namespace Wildfrost_Archipelago
     public static class ServiceFactory
     {
         private static bool init = false;
-        private static ISessionManager sessionManager;
-        private static AssetManager assetManager;
+        public static ISessionManager sessionManager { get; private set; }
+        public static AssetManager assetManager { get; private set; }
+        public static Managers.EventManager eventManager { get; private set; }
 
         public static void Init(bool debug = false)
         {
             if (init) return;
 
             assetManager = new AssetManager();
+            eventManager = new Managers.EventManager();
             if (debug)
                 sessionManager = new MockSessionManager();
             else
@@ -26,8 +28,5 @@ namespace Wildfrost_Archipelago
 
             init = true;
         }
-
-        public static ISessionManager GetSessionManager() => sessionManager;
-        public static AssetManager GetAssetManager() => assetManager;
     }
 }

@@ -1,0 +1,143 @@
+﻿using Deadpan.Enums.Engine.Components.Modding;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Wildfrost_Archipelago.Managers
+{
+    public class EventManager
+    {
+        public void LoadEvents()
+        {
+            Events.OnMapNodeSelect += Events_OnMapNodeSelect;
+            Events.OnCardDataCreated += Events_OnCardDataCreated;
+            //Events.OnEntityEnterBackpack += Events_OnEntityEnterBackpack;
+            //Events.OnUpgradeGained += Events_OnUpgradeGained;
+        }
+
+        public void UnloadEvents()
+        {
+            Events.OnMapNodeSelect -= Events_OnMapNodeSelect;
+            Events.OnCardDataCreated -= Events_OnCardDataCreated;
+            //Events.OnEntityEnterBackpack -= Events_OnEntityEnterBackpack;
+            //Events.OnUpgradeGained -= Events_OnUpgradeGained;
+        }
+
+        int temp = 1;
+        private void Events_OnCardDataCreated(CardData card)
+        {
+            if (card.name == "mweinhold.wildfrost.archipelago.archifact_item")
+            {
+                Logger.Log(LogType.Info, "Modifying an Archifact card");
+                card.forceTitle = "Force Title " + temp.ToString();
+                card.attackEffects.First().data.textInsert = "New <Text>";
+                temp++;
+            }
+        }
+
+        private void Events_OnMapNodeSelect(MapNode node)
+        {
+            switch (node.campaignNode.type)
+            {
+                case CampaignNodeTypeItem item:
+                    ManageItemNode(node);
+                    break;
+                case CampaignNodeTypeShop shop:
+                    ManageShopNode(node);
+                    break;
+                case CampaignNodeTypeCharm charm:
+                    ManageCharmNode(node);
+                    break;
+                case CampaignNodeTypeCompanion companion:
+                    ManageCompanionNode(node);
+                    break;
+                case CampaignNodeTypeCharmShop charmShop:
+                    ManageCharmShopNode(node);
+                    break;
+                case CampaignNodeTypeCurseItems gnome:
+                    ManageGnomeNode(node);
+                    break;
+            }
+        }
+
+        private void Events_OnUpgradeGained(CardUpgradeData charm)
+        {
+            // Works for charms
+            Logger.Log(LogType.Info, $"Charm Found: {charm.title} : {charm.name}");
+            if (charm.IsCharm())
+            {
+                References.PlayerData.inventory.upgrades.Remove(charm);
+            }
+        }
+
+        private void Events_OnEntityEnterBackpack(Entity card)
+        {
+            // Works for cards, not charms
+            Logger.Log(LogType.Info, $"Entity Entered Backpack: {card.data?.name ?? "Not a card"}");
+            References.PlayerData.inventory.deck.Remove(card.data);
+        }
+
+        #region Utility Functions
+        private void ManageItemNode(MapNode node)
+        {
+        }
+
+        private void ManageShopNode(MapNode node)
+        {
+            var dataNames = node.campaignNode.data.Keys.ToList();
+            tempPrompt("Shop Data: " + string.Join(", ", dataNames));
+            //shopdata
+        }
+
+        private void ManageCompanionNode(MapNode node)
+        {
+            string name = "mweinhold.wildfrost.archipelago.archifact_unit";
+            List<string> names = new List<string>
+                {
+                    name,
+                    name,
+                    name
+                };
+            var nameCollection = new SaveCollection<string>(names);
+            node.campaignNode.data["cards"] = nameCollection;
+        }
+
+        private void ManageCharmNode(MapNode node)
+        {
+            string name = "mweinhold.wildfrost.archipelago.archifact_charm";
+            List<string> names = new List<string>
+                {
+                    name
+                };
+            var nameCollection = new SaveCollection<string>(names);
+            node.campaignNode.data["charm"] = nameCollection;
+            //var dataNames = node.campaignNode.data.Keys.ToList();
+            //tempPrompt("Charm Data: " + string.Join(", ", dataNames));
+            //charm
+        }
+
+        private void ManageGnomeNode(MapNode node)
+        {
+            var dataNames = node.campaignNode.data.Keys.ToList();
+            tempPrompt("Gnome Data: " + string.Join(", ", dataNames));
+            throw new NotImplementedException();
+        }
+
+        private void ManageCharmShopNode(MapNode node)
+        {
+            var dataNames = node.campaignNode.data.Keys.ToList();
+            tempPrompt("Charm Shop Data: " + string.Join(", ", dataNames));
+            throw new NotImplementedException();
+        }
+
+        private void tempPrompt(string text)
+        {
+            Logger.Log(LogType.Info, text);
+            PromptSystem.Prompt.SetText(text);
+            PromptSystem.Create(Prompt.Anchor.Mid, 0, 0, 3, Prompt.Emote.Type.Basic, Prompt.Emote.Position.Above);
+        }
+        #endregion
+    }
+}

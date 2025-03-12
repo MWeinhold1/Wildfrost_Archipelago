@@ -32,60 +32,8 @@ namespace Wildfrost_Archipelago
         {
             ServiceFactory.Init(debugMode);
             if (!preLoaded) { CreateModAssets(); }
-            //Events.OnSceneLoaded += Events_OnSceneLoaded;
-            Events.OnMapNodeSelect += Events_OnMapNodeSelect;
-            Events.OnCardDataCreated += Events_OnCardDataCreated;
+            ServiceFactory.eventManager.LoadEvents();
             base.Load();
-        }
-        int temp = 1;
-        private void Events_OnCardDataCreated(CardData card)
-        {
-            if (card.name == "mweinhold.wildfrost.archipelago.archifact_item")
-            {
-                Logger.Log(LogType.Info, "Created an Archifact card");
-                card.forceTitle = "Force Title " + temp.ToString();
-                card.attackEffects.First().data.textInsert = "New <Text>";
-                temp++;
-            }
-        }
-
-        private void Events_OnMapNodeSelect(MapNode node)
-        {
-            Logger.Log(LogType.Info, node.name + ": " + node.campaignNode.name);
-
-            var characters = node.campaignNode.characters.Select(i => i.ToString()).ToList();
-            Logger.Log(LogType.Info, string.Join(", ", characters));
-
-            var data = node.campaignNode.data.Select(kvp => kvp.Key + ":" + kvp.Value.ToString());
-            Logger.Log(LogType.Info, string.Join(", ", data));
-
-            if (node.campaignNode.type is CampaignNodeTypeItem)
-            {
-                string name = "mweinhold.wildfrost.archipelago.archifact_item";
-                List<string> names = new List<string>
-                {
-                    name,
-                    name,
-                    name
-                };
-                var nameCollection = new SaveCollection<string>(names);
-                node.campaignNode.data["cards"] = nameCollection;
-                var temp = node.campaignNode.data.GetSaveCollection<string>("cards");
-            }
-
-            Logger.Log(LogType.Info, node.campaignNode.GetDesc());
-        }
-
-        private bool needsRandomizing = true;
-
-        private void Events_OnSceneLoaded(UnityEngine.SceneManagement.Scene scene)
-        {
-            if (needsRandomizing && scene.name == "Town")
-            {
-                Logger.Log(LogType.Info, "Running town loaded scripts");
-                (ServiceFactory.GetSessionManager() as MockSessionManager).DebugInitialRandomizeTest();
-                needsRandomizing = false;
-            }
         }
 
         protected override void Unload()
@@ -99,16 +47,14 @@ namespace Wildfrost_Archipelago
 
         private bool preLoaded = false;
 
-        private RewardRandomizer cardRando;
-
         private void CreateModAssets()
         {
             Logger.Log(LogType.Info, "Loading Mod Assets");
 
-            var assetManager = ServiceFactory.GetAssetManager();
+            var assetManager = ServiceFactory.assetManager;
             assets.Add(assetManager.GetStatusEffectBuilder());
-            //assets.Add(assetManager.GetCharmBuilder());
-            //assets.Add(assetManager.GetUnitBuilder());
+            assets.Add(assetManager.GetCharmBuilder());
+            assets.Add(assetManager.GetUnitBuilder());
             assets.Add(assetManager.GetItemBuilder());
 
             Logger.Log(LogType.Info, "Finished Loading Mod Assets");

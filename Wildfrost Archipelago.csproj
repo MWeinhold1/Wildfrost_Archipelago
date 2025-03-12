@@ -434,16 +434,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Archipelago\AssetManager.cs" />
-    <Compile Include="Archipelago\ItemManager.cs" />
+    <Compile Include="Managers\AssetManager.cs" />
+    <Compile Include="Managers\EventManager.cs" />
     <Compile Include="Constants\APItemConstants.cs" />
     <Compile Include="Constants\APLocationConstants.cs" />
-    <Compile Include="Archipelago\OldLocationManager.cs" />
-    <Compile Include="Archipelago\MockSessionManager.cs" />
-    <Compile Include="Archipelago\APSessionManager.cs" />
+    <Compile Include="Managers\OldLocationManager.cs" />
+    <Compile Include="Managers\MockSessionManager.cs" />
+    <Compile Include="Managers\APSessionManager.cs" />
     <Compile Include="Constants\Options.cs" />
     <Compile Include="Interfaces\ISessionManager.cs" />
-    <Compile Include="Randomizers\RewardRandomizer.cs" />
     <Compile Include="Randomizers\TownRandomizer.cs" />
     <Compile Include="ServiceFactory.cs" />
     <Compile Include="WildfrostArchipelago.cs" />

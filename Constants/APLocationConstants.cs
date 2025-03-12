@@ -37,6 +37,7 @@ namespace Wildfrost_Archipelago.Archipelago.Constants
             this.multiple = multiple;
         }
 
+        // Used for copying a location based on an extisting location reference
         public APLocation(int id, bool isLocal, string unlockName, string targetPlayerName)
         {
             APLocation locRef = APLocationConstants.LocationReferences[id];

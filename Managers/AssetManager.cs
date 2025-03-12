@@ -11,11 +11,6 @@ namespace Wildfrost_Archipelago.Archipelago
 {
     public class AssetManager
     {
-        public CardData itemCard { get; private set; }
-        public CardData unitCard { get; private set; }
-        public CardUpgradeData charm { get; private set; }
-        public StatusEffectData effect { get; private set; }
-
         private Dictionary<string, List<(DataFile card, bool hasBeenFound)>> vanillaPoolReferences;
 
         private HashSet<RewardPool> rewardPools;
@@ -35,7 +30,6 @@ namespace Wildfrost_Archipelago.Archipelago
                     {
                         SStack("New Status Effect", 1)
                     };
-                    itemCard = card;
                 });
         }
         public CardDataBuilder GetUnitBuilder()
@@ -47,7 +41,10 @@ namespace Wildfrost_Archipelago.Archipelago
                 .SetStats(null, null, 0)
                 .SubscribeToAfterAllBuildEvent((card) =>
                 {
-                    unitCard = card;
+                    card.attackEffects = new CardData.StatusEffectStacks[]
+                    {
+                        SStack("New Status Effect", 1)
+                    };
                 });
         }
         public CardUpgradeDataBuilder GetCharmBuilder()
@@ -61,11 +58,7 @@ namespace Wildfrost_Archipelago.Archipelago
                 .WithImage("Archi-fact.png")
                 .WithTitle("Archipelago Charm")
                 .WithText("Archipelago Check")
-                .WithTier(2)
-                .SubscribeToAfterAllBuildEvent((c) =>
-                {
-                    charm = c;
-                });
+                .WithTier(2);
         }
 
         public StatusEffectDataBuilder GetStatusEffectBuilder()
@@ -82,102 +75,102 @@ namespace Wildfrost_Archipelago.Archipelago
 
         }
 
-        public void AddLocationToItemRewardPool(APLocation location)
-        {
-            // Validate that this location can be converted to an item
-            if (location.type != APLocationType.card)
-            {
-                // Not an item card, meaning this location isn't supposed to be for an item card
-                string msg = "Attempted to make an item card asset for the location " + location.id.ToString() + ":" + location.unlockedItem;
-                Logger.Log(LogType.Error, msg);
-                throw new ArgumentException(msg, "location.type");
-            }
+        //public void AddLocationToItemRewardPool(APLocation location)
+        //{
+        //    // Validate that this location can be converted to an item
+        //    if (location.type != APLocationType.card)
+        //    {
+        //        // Not an item card, meaning this location isn't supposed to be for an item card
+        //        string msg = "Attempted to make an item card asset for the location " + location.id.ToString() + ":" + location.unlockedItem;
+        //        Logger.Log(LogType.Error, msg);
+        //        throw new ArgumentException(msg, "location.type");
+        //    }
 
-            if (rewardPools == null || rewardPools.Count == 0)
-            {
-                rewardPools = Extensions.GetAllRewardPools();
-            }
+        //    if (rewardPools == null || rewardPools.Count == 0)
+        //    {
+        //        rewardPools = Extensions.GetAllRewardPools();
+        //    }
 
-            // Determine which item pool this needs to go into
-            RewardPool pool;
-            int itemPoolNum = (location.id / 1000) % 10;
-            switch (itemPoolNum)
-            {
-                case 0:
-                    pool = rewardPools.Where(p => p.name == "BasicItemPool").Single();
-                    break;
-                case 1:
-                    pool = rewardPools.Where(p => p.name == "MagicItemPool").Single();
-                    break;
-                case 2:
-                    pool = rewardPools.Where(p => p.name == "ClunkItemPool").Single();
-                    break;
-                case 3:
-                    pool = rewardPools.Where(p => p.name == "GeneralItemPool").Single();
-                    break;
-                default:
-                    // Not in one of the 4 item pools (snow pool items are considered generic items)
-                    string msg = "Unable to determine the item pool to place a card for " + location.id.ToString() + ":" + location.unlockedItem;
-                    Logger.Log(LogType.Error, msg);
-                    throw new ArgumentException(msg, "location.id");
-            }
+        //    // Determine which item pool this needs to go into
+        //    RewardPool pool;
+        //    int itemPoolNum = (location.id / 1000) % 10;
+        //    switch (itemPoolNum)
+        //    {
+        //        case 0:
+        //            pool = rewardPools.Where(p => p.name == "BasicItemPool").Single();
+        //            break;
+        //        case 1:
+        //            pool = rewardPools.Where(p => p.name == "MagicItemPool").Single();
+        //            break;
+        //        case 2:
+        //            pool = rewardPools.Where(p => p.name == "ClunkItemPool").Single();
+        //            break;
+        //        case 3:
+        //            pool = rewardPools.Where(p => p.name == "GeneralItemPool").Single();
+        //            break;
+        //        default:
+        //            // Not in one of the 4 item pools (snow pool items are considered generic items)
+        //            string msg = "Unable to determine the item pool to place a card for " + location.id.ToString() + ":" + location.unlockedItem;
+        //            Logger.Log(LogType.Error, msg);
+        //            throw new ArgumentException(msg, "location.id");
+        //    }
 
-            var newCard = itemCard.Clone();
-            newCard.titleFallback = newCard.name + ":" + location.id;
-            newCard.flavour = BuildFlavorText(location);
-            newCard.desc = location.id.ToString();
-            //pool.list.Add(newCard);
+        //    var newCard = itemCard.Clone();
+        //    newCard.titleFallback = newCard.name + ":" + location.id;
+        //    newCard.flavour = BuildFlavorText(location);
+        //    newCard.desc = location.id.ToString();
+        //    //pool.list.Add(newCard);
 
-            Logger.Log(LogType.Info, "Added card for " + location.id.ToString() + ":" + location.unlockedItem + " to the reward pool " + pool.name);
-        }
+        //    Logger.Log(LogType.Info, "Added card for " + location.id.ToString() + ":" + location.unlockedItem + " to the reward pool " + pool.name);
+        //}
 
-        public void AddLocationToUnitRewardPool(APLocation location)
-        {
-            // Validate that this location can be converted to an item
-            if (location.type != APLocationType.companion)
-            {
-                // Not an unit card, meaning this location isn't supposed to be for an unit card
-                string msg = "Attempted to make an companion card asset for the location " + location.id.ToString() + ":" + location.unlockedItem;
-                Logger.Log(LogType.Error, msg);
-                throw new ArgumentException(msg, "location.type");
-            }
+        //public void AddLocationToUnitRewardPool(APLocation location)
+        //{
+        //    // Validate that this location can be converted to an item
+        //    if (location.type != APLocationType.companion)
+        //    {
+        //        // Not an unit card, meaning this location isn't supposed to be for an unit card
+        //        string msg = "Attempted to make an companion card asset for the location " + location.id.ToString() + ":" + location.unlockedItem;
+        //        Logger.Log(LogType.Error, msg);
+        //        throw new ArgumentException(msg, "location.type");
+        //    }
 
-            if (rewardPools == null || rewardPools.Count == 0)
-            {
-                rewardPools = Extensions.GetAllRewardPools();
-            }
+        //    if (rewardPools == null || rewardPools.Count == 0)
+        //    {
+        //        rewardPools = Extensions.GetAllRewardPools();
+        //    }
 
-            // Determine which item pool this needs to go into
-            RewardPool pool;
-            int itemPoolNum = (location.id / 1000) % 10;
-            switch (itemPoolNum)
-            {
-                case 0:
-                    pool = rewardPools.Where(p => p.name == "BasicUnitPool").Single();
-                    break;
-                case 1:
-                    pool = rewardPools.Where(p => p.name == "MagicUnitPool").Single();
-                    break;
-                case 2:
-                    pool = rewardPools.Where(p => p.name == "ClunkUnitPool").Single();
-                    break;
-                case 3:
-                    pool = rewardPools.Where(p => p.name == "GeneralUnitPool").Single();
-                    break;
-                default:
-                    // Not in one of the 4 item pools (snow pool items are considered generic items)
-                    string msg = "Unable to determine the unit pool to place a card for " + location.id.ToString() + ":" + location.unlockedItem;
-                    Logger.Log(LogType.Error, msg);
-                    throw new ArgumentException(msg, "location.id");
-            }
+        //    // Determine which item pool this needs to go into
+        //    RewardPool pool;
+        //    int itemPoolNum = (location.id / 1000) % 10;
+        //    switch (itemPoolNum)
+        //    {
+        //        case 0:
+        //            pool = rewardPools.Where(p => p.name == "BasicUnitPool").Single();
+        //            break;
+        //        case 1:
+        //            pool = rewardPools.Where(p => p.name == "MagicUnitPool").Single();
+        //            break;
+        //        case 2:
+        //            pool = rewardPools.Where(p => p.name == "ClunkUnitPool").Single();
+        //            break;
+        //        case 3:
+        //            pool = rewardPools.Where(p => p.name == "GeneralUnitPool").Single();
+        //            break;
+        //        default:
+        //            // Not in one of the 4 item pools (snow pool items are considered generic items)
+        //            string msg = "Unable to determine the unit pool to place a card for " + location.id.ToString() + ":" + location.unlockedItem;
+        //            Logger.Log(LogType.Error, msg);
+        //            throw new ArgumentException(msg, "location.id");
+        //    }
 
-            var newCard = unitCard.Clone();
-            newCard.name = newCard.name + ":" + location.id;
-            newCard.flavour = BuildFlavorText(location);
-            newCard.desc = location.id.ToString();
-            pool.list.Add(newCard);
-            Logger.Log(LogType.Info, "Added card for " + location.id.ToString() + ":" + location.unlockedItem + " to the reward pool " + pool.name);
-        }
+        //    var newCard = unitCard.Clone();
+        //    newCard.name = newCard.name + ":" + location.id;
+        //    newCard.flavour = BuildFlavorText(location);
+        //    newCard.desc = location.id.ToString();
+        //    pool.list.Add(newCard);
+        //    Logger.Log(LogType.Info, "Added card for " + location.id.ToString() + ":" + location.unlockedItem + " to the reward pool " + pool.name);
+        //}
 
         public void EmptyCardRewardPools()
         {
@@ -233,19 +226,5 @@ namespace Wildfrost_Archipelago.Archipelago
         }
 
         public CardData.StatusEffectStacks SStack(string name, int amount) => new CardData.StatusEffectStacks(TryGet<StatusEffectData>(name), amount);
-        //See above
-
-        //Note: you need to add the reference DeadExtensions.dll in order to use InstantiateKeepName(). 
-        public StatusEffectDataBuilder StatusCopy(string oldName, string newName)
-        {
-            var mod = WildfrostArchipelago.modRef;
-
-            StatusEffectData data = TryGet<StatusEffectData>(oldName).InstantiateKeepName();
-            data.name = mod.GUID + "." + newName;
-            data.targetConstraints = new TargetConstraint[0];
-            StatusEffectDataBuilder builder = data.Edit<StatusEffectData, StatusEffectDataBuilder>();
-            builder.Mod = mod;
-            return builder;
-        }
     }
 }
