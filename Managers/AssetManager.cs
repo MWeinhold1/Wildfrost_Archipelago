@@ -50,7 +50,7 @@ namespace Wildfrost_Archipelago.Archipelago
         public CardUpgradeDataBuilder GetCharmBuilder()
         {
             Logger.Log(LogType.Info, "Getting charm builder");
-            return new CardUpgradeDataBuilder(WildfrostArchipelago.modRef).CreateCharm("archifact_charm", "")
+            return new CardUpgradeDataBuilder(WildfrostArchipelago.modRef).Create("archifact_charm")
                 .WithType(CardUpgradeData.Type.Charm)
                 .WithImage("Archi-fact.png")
                 .WithTitle("Archipelago Charm")

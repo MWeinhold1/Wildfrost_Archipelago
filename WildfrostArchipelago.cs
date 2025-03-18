@@ -57,7 +57,7 @@ namespace Wildfrost_Archipelago
             assets.Add(assetManager.GetStatusEffectBuilder());
             assets.Add(assetManager.GetUnitBuilder());
             assets.Add(assetManager.GetItemBuilder());
-            //assets.Add(assetManager.GetCharmBuilder());
+            assets.Add(assetManager.GetCharmBuilder());
 
             Logger.Log(LogType.Info, "Finished Loading Mod Assets");
 

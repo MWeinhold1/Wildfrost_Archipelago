@@ -98,7 +98,7 @@ namespace Wildfrost_Archipelago.Managers
         private void ManageShopNode(MapNode node)
         {
             var shopData = node.campaignNode.data["shopData"] as ShopRoutine.Data;
-            //shopData.charms = new List<string> { "mweinhold.wildfrost.archipelago.archifact_charm", "mweinhold.wildfrost.archipelago.archifact_charm", "mweinhold.wildfrost.archipelago.archifact_charm" };
+            shopData.charms = new List<string> { "mweinhold.wildfrost.archipelago.archifact_charm", "mweinhold.wildfrost.archipelago.archifact_charm", "mweinhold.wildfrost.archipelago.archifact_charm" };
             var newShopItems = new List<ShopRoutine.Item>();
             var rand = new Random();
             for(int i = 0; i < 5; i++)
