@@ -34,7 +34,7 @@ namespace Wildfrost_Archipelago.Archipelago
         }
         public CardDataBuilder GetUnitBuilder()
         {
-            Logger.Log(LogType.Info, "Getting item card builder");
+            Logger.Log(LogType.Info, "Getting unit card builder");
             return new CardDataBuilder(WildfrostArchipelago.modRef).CreateUnit("archifact_unit", "Archi-fact")
                 .SetSprites("Archi-fact.png", "Archi-fact.png")
                 .WithCardType("Friendly")
@@ -49,11 +49,8 @@ namespace Wildfrost_Archipelago.Archipelago
         }
         public CardUpgradeDataBuilder GetCharmBuilder()
         {
-            new StatusEffectDataBuilder(WildfrostArchipelago.modRef).Create("archipelago_effect")
-                .WithText("{0}");
-
             Logger.Log(LogType.Info, "Getting charm builder");
-            return new CardUpgradeDataBuilder(WildfrostArchipelago.modRef).CreateCharm("archifact_charm", "pool")
+            return new CardUpgradeDataBuilder(WildfrostArchipelago.modRef).CreateCharm("archifact_charm", "")
                 .WithType(CardUpgradeData.Type.Charm)
                 .WithImage("Archi-fact.png")
                 .WithTitle("Archipelago Charm")

@@ -30,10 +30,12 @@ namespace Wildfrost_Archipelago
         public override string Description => "Adds Archipelago Randomizer support to Wildfrost";
         protected override void Load()
         {
+            Logger.Log(LogType.Info, "Loading Wildfrost Archipelago Mod");
             ServiceFactory.Init(debugMode);
             if (!preLoaded) { CreateModAssets(); }
             ServiceFactory.eventManager.LoadEvents();
             base.Load();
+            Logger.Log(LogType.Info, "Finished Loading Wildfrost Archipelago Mod");
         }
 
         protected override void Unload()
@@ -53,9 +55,9 @@ namespace Wildfrost_Archipelago
 
             var assetManager = ServiceFactory.assetManager;
             assets.Add(assetManager.GetStatusEffectBuilder());
-            assets.Add(assetManager.GetCharmBuilder());
             assets.Add(assetManager.GetUnitBuilder());
             assets.Add(assetManager.GetItemBuilder());
+            //assets.Add(assetManager.GetCharmBuilder());
 
             Logger.Log(LogType.Info, "Finished Loading Mod Assets");
 

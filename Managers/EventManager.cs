@@ -11,6 +11,7 @@ namespace Wildfrost_Archipelago.Managers
     {
         public void LoadEvents()
         {
+            Logger.Log(LogType.Info, "Loading Events");
             Events.OnMapNodeSelect += Events_OnMapNodeSelect;
             Events.OnCardDataCreated += Events_OnCardDataCreated;
             //Events.OnEntityEnterBackpack += Events_OnEntityEnterBackpack;
@@ -19,6 +20,7 @@ namespace Wildfrost_Archipelago.Managers
 
         public void UnloadEvents()
         {
+            Logger.Log(LogType.Info, "Unloading Events");
             Events.OnMapNodeSelect -= Events_OnMapNodeSelect;
             Events.OnCardDataCreated -= Events_OnCardDataCreated;
             //Events.OnEntityEnterBackpack -= Events_OnEntityEnterBackpack;
@@ -82,13 +84,38 @@ namespace Wildfrost_Archipelago.Managers
         #region Utility Functions
         private void ManageItemNode(MapNode node)
         {
+            string name = "mweinhold.wildfrost.archipelago.archifact_item";
+            List<string> names = new List<string>
+                {
+                    name,
+                    name,
+                    name
+                };
+            var nameCollection = new SaveCollection<string>(names);
+            node.campaignNode.data["cards"] = nameCollection;
         }
 
         private void ManageShopNode(MapNode node)
         {
-            var dataNames = node.campaignNode.data.Keys.ToList();
-            tempPrompt("Shop Data: " + string.Join(", ", dataNames));
-            //shopdata
+            var shopData = node.campaignNode.data["shopData"] as ShopRoutine.Data;
+            //shopData.charms = new List<string> { "mweinhold.wildfrost.archipelago.archifact_charm", "mweinhold.wildfrost.archipelago.archifact_charm", "mweinhold.wildfrost.archipelago.archifact_charm" };
+            var newShopItems = new List<ShopRoutine.Item>();
+            var rand = new Random();
+            for(int i = 0; i < 5; i++)
+            {
+                var item = new ShopRoutine.Item();
+                if (newShopItems.Count == 0)
+                    item.category = "Consumables";
+                else
+                    item.category = "Items";
+                item.cardDataName = "mweinhold.wildfrost.archipelago.archifact_item";
+                item.price = rand.Next(20, 70);
+                item.priceFactor = 1;
+                item.purchased = false;
+                newShopItems.Add(item);
+            }
+            shopData.items = newShopItems;
+            node.campaignNode.data["shopData"] = shopData;
         }
 
         private void ManageCompanionNode(MapNode node)
@@ -107,19 +134,15 @@ namespace Wildfrost_Archipelago.Managers
         private void ManageCharmNode(MapNode node)
         {
             string name = "mweinhold.wildfrost.archipelago.archifact_charm";
-            List<string> names = new List<string>
-                {
-                    name
-                };
-            var nameCollection = new SaveCollection<string>(names);
-            node.campaignNode.data["charm"] = nameCollection;
-            //var dataNames = node.campaignNode.data.Keys.ToList();
-            //tempPrompt("Charm Data: " + string.Join(", ", dataNames));
-            //charm
+            node.campaignNode.data["charm"] = name;
         }
 
         private void ManageGnomeNode(MapNode node)
         {
+            throw new NotImplementedException();
+
+
+
             var dataNames = node.campaignNode.data.Keys.ToList();
             tempPrompt("Gnome Data: " + string.Join(", ", dataNames));
             throw new NotImplementedException();
@@ -127,6 +150,10 @@ namespace Wildfrost_Archipelago.Managers
 
         private void ManageCharmShopNode(MapNode node)
         {
+            throw new NotImplementedException();
+
+
+
             var dataNames = node.campaignNode.data.Keys.ToList();
             tempPrompt("Charm Shop Data: " + string.Join(", ", dataNames));
             throw new NotImplementedException();

@@ -19,6 +19,8 @@ namespace Wildfrost_Archipelago
         {
             if (init) return;
 
+            Logger.Log(LogType.Info, "Initializing Service Factory");
+
             assetManager = new AssetManager();
             eventManager = new Managers.EventManager();
             if (debug)
