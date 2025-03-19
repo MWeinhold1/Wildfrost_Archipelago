@@ -59,11 +59,12 @@ namespace Wildfrost_Archipelago.Managers
         public CardUpgradeDataBuilder GetCharmBuilder()
         {
             Logger.Log(LogType.Info, "Getting charm builder");
+
             return new CardUpgradeDataBuilder(WildfrostArchipelago.modRef).Create(internalCharmName)
                 .WithType(CardUpgradeData.Type.Charm)
-                .WithImage("Archi-fact.png");
-                //.WithTitle("Archipelago Item")
-                //.WithText("Archipelago Check");
+                .WithImage("Archi-fact.png")
+                .WithTitle("Archipelago Item")
+                .WithText("Archipelago Check");
         }
 
         public StatusEffectDataBuilder GetStatusEffectBuilder()

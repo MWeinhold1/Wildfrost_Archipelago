@@ -49,16 +49,16 @@ namespace Wildfrost_Archipelago.Managers
                     ManageShopNode(node);
                     break;
                 case CampaignNodeTypeCharm charm:
-                    ManageCharmNode(node);
+                    //ManageCharmNode(node);
                     break;
                 case CampaignNodeTypeCompanion companion:
                     ManageCompanionNode(node);
                     break;
                 case CampaignNodeTypeCharmShop charmShop:
-                    ManageCharmShopNode(node);
+                    //ManageCharmShopNode(node);
                     break;
                 case CampaignNodeTypeCurseItems gnome:
-                    ManageGnomeNode(node);
+                    //ManageGnomeNode(node);
                     break;
             }
         }
