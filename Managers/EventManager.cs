@@ -15,7 +15,7 @@ namespace Wildfrost_Archipelago.Managers
             Events.OnMapNodeSelect += Events_OnMapNodeSelect;
             Events.OnCardDataCreated += Events_OnCardDataCreated;
             //Events.OnEntityEnterBackpack += Events_OnEntityEnterBackpack;
-            Events.OnUpgradeGained += Events_OnUpgradeGained;
+            //Events.OnUpgradeGained += Events_OnUpgradeGained;
         }
 
         public void UnloadEvents()
@@ -24,7 +24,7 @@ namespace Wildfrost_Archipelago.Managers
             Events.OnMapNodeSelect -= Events_OnMapNodeSelect;
             Events.OnCardDataCreated -= Events_OnCardDataCreated;
             //Events.OnEntityEnterBackpack -= Events_OnEntityEnterBackpack;
-            Events.OnUpgradeGained -= Events_OnUpgradeGained;
+            //Events.OnUpgradeGained -= Events_OnUpgradeGained;
         }
 
         private void Events_OnCardDataCreated(CardData card)
