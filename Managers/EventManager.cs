@@ -15,7 +15,7 @@ namespace Wildfrost_Archipelago.Managers
             Events.OnMapNodeSelect += Events_OnMapNodeSelect;
             Events.OnCardDataCreated += Events_OnCardDataCreated;
             //Events.OnEntityEnterBackpack += Events_OnEntityEnterBackpack;
-            //Events.OnUpgradeGained += Events_OnUpgradeGained;
+            Events.OnUpgradeGained += Events_OnUpgradeGained;
         }
 
         public void UnloadEvents()
@@ -24,18 +24,17 @@ namespace Wildfrost_Archipelago.Managers
             Events.OnMapNodeSelect -= Events_OnMapNodeSelect;
             Events.OnCardDataCreated -= Events_OnCardDataCreated;
             //Events.OnEntityEnterBackpack -= Events_OnEntityEnterBackpack;
-            //Events.OnUpgradeGained -= Events_OnUpgradeGained;
+            Events.OnUpgradeGained -= Events_OnUpgradeGained;
         }
 
-        int temp = 1;
         private void Events_OnCardDataCreated(CardData card)
         {
-            if (card.name == "mweinhold.wildfrost.archipelago.archifact_item")
+            if (card.name == AssetManager.fullItemName ||
+                card.name == AssetManager.fullUnitName)
             {
                 Logger.Log(LogType.Info, "Modifying an Archifact card");
-                card.forceTitle = "Force Title " + temp.ToString();
-                card.attackEffects.First().data.textInsert = "New <Text>";
-                temp++;
+                card.forceTitle = "AP Item Name";
+                card.attackEffects.First().data.textInsert = "Send <Sample Text> to <Other Player>";
             }
         }
 
@@ -68,10 +67,10 @@ namespace Wildfrost_Archipelago.Managers
         {
             // Works for charms
             Logger.Log(LogType.Info, $"Charm Found: {charm.title} : {charm.name}");
-            if (charm.IsCharm())
-            {
-                References.PlayerData.inventory.upgrades.Remove(charm);
-            }
+            //if (charm.IsCharm())
+            //{
+            //    References.PlayerData.inventory.upgrades.Remove(charm);
+            //}
         }
 
         private void Events_OnEntityEnterBackpack(Entity card)
@@ -84,7 +83,7 @@ namespace Wildfrost_Archipelago.Managers
         #region Utility Functions
         private void ManageItemNode(MapNode node)
         {
-            string name = "mweinhold.wildfrost.archipelago.archifact_item";
+            string name = AssetManager.fullItemName;
             List<string> names = new List<string>
                 {
                     name,
@@ -98,17 +97,17 @@ namespace Wildfrost_Archipelago.Managers
         private void ManageShopNode(MapNode node)
         {
             var shopData = node.campaignNode.data["shopData"] as ShopRoutine.Data;
-            shopData.charms = new List<string> { "mweinhold.wildfrost.archipelago.archifact_charm", "mweinhold.wildfrost.archipelago.archifact_charm", "mweinhold.wildfrost.archipelago.archifact_charm" };
+            shopData.charms = new List<string> { AssetManager.fullCharmName, AssetManager.fullCharmName, AssetManager.fullCharmName };
             var newShopItems = new List<ShopRoutine.Item>();
             var rand = new Random();
-            for(int i = 0; i < 5; i++)
+            for(int i = 0; i < 4; i++)
             {
                 var item = new ShopRoutine.Item();
                 if (newShopItems.Count == 0)
                     item.category = "Consumables";
                 else
                     item.category = "Items";
-                item.cardDataName = "mweinhold.wildfrost.archipelago.archifact_item";
+                item.cardDataName = AssetManager.fullItemName;
                 item.price = rand.Next(20, 70);
                 item.priceFactor = 1;
                 item.purchased = false;
@@ -120,7 +119,7 @@ namespace Wildfrost_Archipelago.Managers
 
         private void ManageCompanionNode(MapNode node)
         {
-            string name = "mweinhold.wildfrost.archipelago.archifact_unit";
+            string name = AssetManager.fullUnitName;
             List<string> names = new List<string>
                 {
                     name,
@@ -133,7 +132,7 @@ namespace Wildfrost_Archipelago.Managers
 
         private void ManageCharmNode(MapNode node)
         {
-            string name = "mweinhold.wildfrost.archipelago.archifact_charm";
+            string name = AssetManager.fullCharmName;
             node.campaignNode.data["charm"] = name;
         }
 

@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Localization;
-using Wildfrost_Archipelago.Archipelago;
-using Wildfrost_Archipelago.Randomizers;
 
 namespace Wildfrost_Archipelago
 {

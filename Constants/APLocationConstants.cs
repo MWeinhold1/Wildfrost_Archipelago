@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Wildfrost_Archipelago.Archipelago.Constants
+namespace Wildfrost_Archipelago.Constants
 {
     public enum APLocationType
     {

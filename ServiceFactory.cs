@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Wildfrost_Archipelago.Archipelago;
 using Wildfrost_Archipelago.Interfaces;
+using Wildfrost_Archipelago.Managers;
 
 namespace Wildfrost_Archipelago
 {

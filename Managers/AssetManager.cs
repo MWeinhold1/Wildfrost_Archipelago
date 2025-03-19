@@ -5,12 +5,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Wildfrost_Archipelago.Archipelago.Constants;
+using Wildfrost_Archipelago.Constants;
 
-namespace Wildfrost_Archipelago.Archipelago
+namespace Wildfrost_Archipelago.Managers
 {
     public class AssetManager
     {
+        public static string internalItemName = "archifact_item";
+        public static string internalUnitName = "archifact_unit";
+        public static string internalCharmName = "archifact_charm";
+        public static string internalStatusName = "archifact_status";
+        public static string fullItemName = WildfrostArchipelago.modRef.GUID + "." + internalItemName;
+        public static string fullUnitName = WildfrostArchipelago.modRef.GUID + "." + internalUnitName;
+        public static string fullCharmName = WildfrostArchipelago.modRef.GUID + "." + internalCharmName;
+        public static string fullStatusName = WildfrostArchipelago.modRef.GUID + "." + internalStatusName;
+
         private Dictionary<string, List<(DataFile card, bool hasBeenFound)>> vanillaPoolReferences;
 
         private HashSet<RewardPool> rewardPools;
@@ -19,7 +28,7 @@ namespace Wildfrost_Archipelago.Archipelago
         {
             Logger.Log(LogType.Info, "Getting item card builder");
             Random rng = new Random();
-            return new CardDataBuilder(WildfrostArchipelago.modRef).CreateItem("archifact_item", "Archi-fact")
+            return new CardDataBuilder(WildfrostArchipelago.modRef).CreateItem(internalItemName, "Archi-fact")
                 .SetSprites("Archi-fact.png", "Archi-fact.png")
                 .WithCardType("Item")
                 .WithPlayType(Card.PlayType.None)
@@ -28,14 +37,14 @@ namespace Wildfrost_Archipelago.Archipelago
                 {
                     card.attackEffects = new CardData.StatusEffectStacks[]
                     {
-                        SStack("New Status Effect", 1)
+                        SStack(internalStatusName, 1)
                     };
                 });
         }
         public CardDataBuilder GetUnitBuilder()
         {
             Logger.Log(LogType.Info, "Getting unit card builder");
-            return new CardDataBuilder(WildfrostArchipelago.modRef).CreateUnit("archifact_unit", "Archi-fact")
+            return new CardDataBuilder(WildfrostArchipelago.modRef).CreateUnit(internalUnitName, "Archi-fact")
                 .SetSprites("Archi-fact.png", "Archi-fact.png")
                 .WithCardType("Friendly")
                 .SetStats(null, null, 0)
@@ -43,27 +52,26 @@ namespace Wildfrost_Archipelago.Archipelago
                 {
                     card.attackEffects = new CardData.StatusEffectStacks[]
                     {
-                        SStack("New Status Effect", 1)
+                        SStack(internalStatusName, 1)
                     };
                 });
         }
         public CardUpgradeDataBuilder GetCharmBuilder()
         {
             Logger.Log(LogType.Info, "Getting charm builder");
-            return new CardUpgradeDataBuilder(WildfrostArchipelago.modRef).Create("archifact_charm")
+            return new CardUpgradeDataBuilder(WildfrostArchipelago.modRef).Create(internalCharmName)
                 .WithType(CardUpgradeData.Type.Charm)
-                .WithImage("Archi-fact.png")
-                .WithTitle("Archipelago Charm")
-                .WithText("Archipelago Check")
-                .WithTier(2);
+                .WithImage("Archi-fact.png");
+                //.WithTitle("Archipelago Item")
+                //.WithText("Archipelago Check");
         }
 
         public StatusEffectDataBuilder GetStatusEffectBuilder()
         {
             Logger.Log(LogType.Info, "Getting status effect builder");
-            return new StatusEffectDataBuilder(WildfrostArchipelago.modRef).Create<StatusEffectSendAPCheck>("New Status Effect")
-                .WithText("Test: {0}")
-                .WithTextInsert("Default Insert")
+            return new StatusEffectDataBuilder(WildfrostArchipelago.modRef).Create<StatusEffectSendAPCheck>(internalStatusName)
+                .WithText("{0}")
+                .WithTextInsert("ERROR: Unknown Item")
                 .WithType("");
         }
 

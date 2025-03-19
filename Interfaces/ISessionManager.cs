@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Wildfrost_Archipelago.Archipelago.Constants;
+using Wildfrost_Archipelago.Constants;
 
 namespace Wildfrost_Archipelago.Interfaces
 {
