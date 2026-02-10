@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine.Localization.SmartFormat.Utilities;
 
 namespace Wildfrost_Archipelago.Managers
 {
@@ -83,15 +84,23 @@ namespace Wildfrost_Archipelago.Managers
         #region Utility Functions
         private void ManageItemNode(MapNode node)
         {
+            if (node.campaignNode.data.ContainsKey("AP_mod"))
+                return;
             string name = AssetManager.fullItemName;
-            List<string> names = new List<string>
+            Random rand = new Random();
+            SaveCollection<string> saveCollection = node.campaignNode.data.Get<SaveCollection<string>>("cards");
+            foreach (int num3 in saveCollection.collection.GetIndices<string>().InRandomOrder<int>())
+            {
+                Logger.Log(LogType.Info, "trying");
+                if (rand.Next(0, 100) >= 50)
                 {
-                    name,
-                    name,
-                    name
-                };
-            var nameCollection = new SaveCollection<string>(names);
-            node.campaignNode.data["cards"] = nameCollection;
+                    Logger.Log(LogType.Info, "succeeded");
+                    saveCollection[num3] = name;
+                    if (node.campaignNode.data.ContainsKey(string.Format("upgrades{0}", num3)))
+                        node.campaignNode.data.Remove(string.Format("upgrades{0}", num3));
+                }
+            }
+            node.campaignNode.data.Add("AP_mod", true);
         }
 
         private void ManageShopNode(MapNode node)

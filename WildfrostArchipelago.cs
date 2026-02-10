@@ -26,7 +26,7 @@ namespace Wildfrost_Archipelago
         public override string Title => "[WIP] Wildfrost Archipelago";
 
         public override string Description => "Adds Archipelago Randomizer support to Wildfrost";
-        protected override void Load()
+        public override void Load()
         {
             Logger.Log(LogType.Info, "Loading Wildfrost Archipelago Mod");
             ServiceFactory.Init(debugMode);
@@ -36,7 +36,7 @@ namespace Wildfrost_Archipelago
             Logger.Log(LogType.Info, "Finished Loading Wildfrost Archipelago Mod");
         }
 
-        protected override void Unload()
+        public override void Unload()
         {
             UnloadFromClasses();
             base.Unload();

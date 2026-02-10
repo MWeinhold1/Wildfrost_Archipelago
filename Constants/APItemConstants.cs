@@ -289,7 +289,7 @@ namespace Wildfrost_Archipelago.Constants
             {70039, new APItem(70039, 70, "CardUpgradeSun", "Sun Charm")},
             {70040, new APItem(70040, 70, "CardUpgradeGlass", "Sunglass Charm")},
             {70041, new APItem(70041, 70, "CardUpgradeHunger", "Zoomlin Charm")},
-            {70042, new APItem(70041, 70, "CardUpgradeScrap", "Scrap Charm")},
+            {70042, new APItem(70042, 70, "CardUpgradeScrap", "Scrap Charm")},
         };
         public static Dictionary<long, APItem> SnowCharm = new Dictionary<long, APItem>
         {
