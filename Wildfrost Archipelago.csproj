@@ -438,15 +438,14 @@
     <Compile Include="Managers\EventManager.cs" />
     <Compile Include="Constants\APItemConstants.cs" />
     <Compile Include="Constants\APLocationConstants.cs" />
-    <Compile Include="Managers\OldLocationManager.cs" />
     <Compile Include="Managers\MockSessionManager.cs" />
     <Compile Include="Managers\APSessionManager.cs" />
     <Compile Include="Constants\Options.cs" />
     <Compile Include="Interfaces\ISessionManager.cs" />
-    <Compile Include="Randomizers\TownRandomizer.cs" />
     <Compile Include="ServiceFactory.cs" />
     <Compile Include="WildfrostArchipelago.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
