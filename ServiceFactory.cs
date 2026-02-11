@@ -15,6 +15,7 @@ namespace Wildfrost_Archipelago
         public static ISessionManager sessionManager { get; private set; }
         public static AssetManager assetManager { get; private set; }
         public static Managers.EventManager eventManager { get; private set; }
+        public static PoolsManager poolsManager { get; private set; }
 
         public static void Init(bool debug = false)
         {
@@ -28,6 +29,10 @@ namespace Wildfrost_Archipelago
                 sessionManager = new MockSessionManager();
             else
                 sessionManager = new APSessionManager();
+            poolsManager = new PoolsManager();
+
+            if (debug)
+                poolsManager.UpdatePools(sessionManager.GetAllReceivedItems());
 
             init = true;
         }

@@ -45,6 +45,48 @@ namespace Wildfrost_Archipelago.Constants
 
     public static class APItemConstants
     {
+        public static APItem GetItem(long id)
+        {
+            switch (id.ToString().Remove(2, 3))
+            {
+                case "00":
+                    return APItemConstants.Filler[id];
+                case "10":
+                    return APItemConstants.Buildings[id];
+                case "20":
+                    return APItemConstants.Tribes[id];
+                case "50":
+                    return APItemConstants.CommonItems[id];
+                case "51":
+                    return APItemConstants.SnowItems[id];
+                case "52":
+                    return APItemConstants.ShadeItems[id];
+                case "53":
+                    return APItemConstants.ClunkItems[id];
+                case "60":
+                    return APItemConstants.CommonUnits[id];
+                case "61":
+                    return APItemConstants.SnowUnits[id];
+                case "62":
+                    return APItemConstants.ShadeUnits[id];
+                case "63":
+                    return APItemConstants.ClunkItems[id];
+                case "70":
+                    return APItemConstants.CommonCharm[id];
+                case "71":
+                    return APItemConstants.SnowCharm[id];
+                case "72":
+                    return APItemConstants.ShadeCharm[id];
+                case "73":
+                    return APItemConstants.ClunkCharm[id];
+                case "80":
+                    return APItemConstants.Bell[id];
+                case "90":
+                    return APItemConstants.TrapBoon[id];
+                default:
+                    return null;
+            }
+        }
         public static Dictionary<long, APItem> Filler = new Dictionary<long, APItem> { };
 
         public static Dictionary<long, APItem> Buildings = new Dictionary<long, APItem>

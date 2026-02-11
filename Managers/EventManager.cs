@@ -1,4 +1,5 @@
 ﻿using Deadpan.Enums.Engine.Components.Modding;
+using FMODUnity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace Wildfrost_Archipelago.Managers
         public void LoadEvents()
         {
             Logger.Log(LogType.Info, "Loading Events");
+            Events.OnCampaignStart += Events_OnCampaignStart;
             Events.OnMapNodeSelect += Events_OnMapNodeSelect;
             Events.OnCardDataCreated += Events_OnCardDataCreated;
             //Events.OnEntityEnterBackpack += Events_OnEntityEnterBackpack;
@@ -50,7 +52,7 @@ namespace Wildfrost_Archipelago.Managers
                     ManageShopNode(node);
                     break;
                 case CampaignNodeTypeCharm charm:
-                    //ManageCharmNode(node);
+                    ManageCharmNode(node);
                     break;
                 case CampaignNodeTypeCompanion companion:
                     ManageCompanionNode(node);
@@ -81,6 +83,11 @@ namespace Wildfrost_Archipelago.Managers
             References.PlayerData.inventory.deck.Remove(card.data);
         }
 
+        private void Events_OnCampaignStart()
+        {
+            ServiceFactory.poolsManager.PopulatePools();
+        }
+
         #region Utility Functions
         private void ManageItemNode(MapNode node)
         {
@@ -91,14 +98,13 @@ namespace Wildfrost_Archipelago.Managers
             SaveCollection<string> saveCollection = node.campaignNode.data.Get<SaveCollection<string>>("cards");
             foreach (int num3 in saveCollection.collection.GetIndices<string>().InRandomOrder<int>())
             {
-                Logger.Log(LogType.Info, "trying");
                 if (rand.Next(0, 100) >= 50)
-                {
-                    Logger.Log(LogType.Info, "succeeded");
                     saveCollection[num3] = name;
-                    if (node.campaignNode.data.ContainsKey(string.Format("upgrades{0}", num3)))
-                        node.campaignNode.data.Remove(string.Format("upgrades{0}", num3));
-                }
+                else
+                    saveCollection[num3] = ServiceFactory.poolsManager.PullItem().name;
+
+                if (node.campaignNode.data.ContainsKey(string.Format("upgrades{0}", num3)))
+                    node.campaignNode.data.Remove(string.Format("upgrades{0}", num3));
             }
             node.campaignNode.data.Add("AP_mod", true);
         }
@@ -128,21 +134,35 @@ namespace Wildfrost_Archipelago.Managers
 
         private void ManageCompanionNode(MapNode node)
         {
+            if (node.campaignNode.data.ContainsKey("AP_mod"))
+                return;
             string name = AssetManager.fullUnitName;
-            List<string> names = new List<string>
-                {
-                    name,
-                    name,
-                    name
-                };
-            var nameCollection = new SaveCollection<string>(names);
-            node.campaignNode.data["cards"] = nameCollection;
+            Random rand = new Random();
+            SaveCollection<string> saveCollection = node.campaignNode.data.Get<SaveCollection<string>>("cards");
+            foreach (int num3 in saveCollection.collection.GetIndices<string>().InRandomOrder<int>())
+            {
+                if (rand.Next(0, 100) >= 50)
+                    saveCollection[num3] = name;
+                else
+                    saveCollection[num3] = ServiceFactory.poolsManager.PullUnit().name;
+
+                if (node.campaignNode.data.ContainsKey(string.Format("upgrades{0}", num3)))
+                    node.campaignNode.data.Remove(string.Format("upgrades{0}", num3));
+            }
+            node.campaignNode.data.Add("AP_mod", true);
         }
 
         private void ManageCharmNode(MapNode node)
         {
+            if (node.campaignNode.data.ContainsKey("AP_mod"))
+                return;
             string name = AssetManager.fullCharmName;
-            node.campaignNode.data["charm"] = name;
+            Random rand = new Random();
+            if (rand.Next(0, 100) >= 50)
+                node.campaignNode.data["charm"] = name;
+            else
+                node.campaignNode.data["charm"] = ServiceFactory.poolsManager.PullItem().name;
+            node.campaignNode.data.Add("AP_mod", true);
         }
 
         private void ManageGnomeNode(MapNode node)

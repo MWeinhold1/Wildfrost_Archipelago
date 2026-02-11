@@ -1,5 +1,7 @@
 ﻿using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
+using Archipelago.MultiClient.Net.Helpers;
+using Archipelago.MultiClient.Net.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +38,8 @@ namespace Wildfrost_Archipelago.Archipelago
                 {
                     LoginSuccessful success = (LoginSuccessful)result;
                     Logger.Log(LogType.Info, $"Successful connection to {uriAndPort}: Connected to slot ${success.Slot}");
+                    //session.Items.ItemReceived += ItemReceived;
+                    ServiceFactory.poolsManager.UpdatePools(GetAllReceivedItems());
                     return true;
                 }
             }
@@ -49,7 +53,12 @@ namespace Wildfrost_Archipelago.Archipelago
 
         public string GetLocationName(int APID) => session.Locations.GetLocationNameFromId(APID);
 
-        public List<APItem> GetAllReceivedItems() { throw new NotImplementedException(); }
+        public List<APItem> GetAllReceivedItems() {
+            List<APItem> list = new List<APItem>();
+            foreach (ItemInfo item in session.Items.AllItemsReceived.ToArray())
+                list.Append(APItemConstants.GetItem(item.ItemId));
+            return list;
+        }
 
         public List<APLocation> GetAllRemainingLocations() { throw new NotImplementedException(); }
 
@@ -62,5 +71,9 @@ namespace Wildfrost_Archipelago.Archipelago
         public void SendLocationsFound(int[] locationIDs) { throw new NotImplementedException(); }
 
         public void SendDeath() { throw new NotImplementedException(); }
+        private void ItemReceived(ReceivedItemsHelper.ItemReceivedHandler helper)
+        {
+            ServiceFactory.poolsManager.UpdatePools(GetAllReceivedItems());
+        }
     }
 }

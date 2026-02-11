@@ -375,6 +375,7 @@
     <Compile Include="Managers\APSessionManager.cs" />
     <Compile Include="Constants\Options.cs" />
     <Compile Include="Interfaces\ISessionManager.cs" />
+    <Compile Include="Managers\PoolsManager.cs" />
     <Compile Include="ServiceFactory.cs" />
     <Compile Include="WildfrostArchipelago.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

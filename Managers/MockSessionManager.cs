@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Archipelago.MultiClient.Net.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,12 @@ namespace Wildfrost_Archipelago.Archipelago
             return true;
         }
 
-        public List<APItem> GetAllReceivedItems() { throw new NotImplementedException(); }
+        public List<APItem> GetAllReceivedItems() {
+            List<APItem> list = new List<APItem>();
+            foreach (long item in ReceivedItemIDs)
+                list = list.Append(APItemConstants.GetItem(item)).ToList();
+            return list;
+        }
 
         public List<APLocation> GetAllRemainingLocations() { throw new NotImplementedException(); }
 
@@ -33,6 +39,12 @@ namespace Wildfrost_Archipelago.Archipelago
         {
             {"goal", 0},
             {"deathlink", false},
+        };
+        private static readonly long[] ReceivedItemIDs = {
+            50000,
+            52001,
+            62006,
+            70027
         };
     }
 }
