@@ -68,12 +68,15 @@ namespace Wildfrost_Archipelago.Archipelago
 
         public void ReceiveItemCallback() { throw new NotImplementedException(); }
 
-        public void SendLocationsFound(int[] locationIDs) { throw new NotImplementedException(); }
+        public void SendLocationsFound(int[] locationIDs) { throw new NotImplementedException();
+            /*foreach (int ID in locationIDs)
+                session.Locations.GetLocationIdFromName("Wildfrost", APLocationConstants.LocationReferences[ID].localDescription);*/
+        }
 
         public void SendDeath() { throw new NotImplementedException(); }
-        private void ItemReceived(ReceivedItemsHelper.ItemReceivedHandler helper)
+        /*private void ItemReceived(ReceivedItemsHelper.ItemReceivedHandler helper)
         {
             ServiceFactory.poolsManager.UpdatePools(GetAllReceivedItems());
-        }
+        }*/
     }
 }

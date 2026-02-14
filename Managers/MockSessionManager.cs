@@ -1,6 +1,7 @@
 ﻿using Archipelago.MultiClient.Net.Models;
 using System;
 using System.Collections.Generic;
+using System.Deployment.Internal;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace Wildfrost_Archipelago.Archipelago
 
         public void ReceiveItemCallback() { throw new NotImplementedException(); }
 
-        public void SendLocationsFound(int[] locationIDs) { throw new NotImplementedException(); }
+        public void SendLocationsFound(int[] locationIDs) { foreach (int ID in locationIDs) Logger.Log(LogType.Info, "Got location " + APLocationConstants.LocationReferences[ID].localDescription); }
 
         public void SendDeath() { throw new NotImplementedException(); }
 

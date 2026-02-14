@@ -17,16 +17,17 @@ namespace Wildfrost_Archipelago.Managers
             Events.OnCampaignStart += Events_OnCampaignStart;
             Events.OnMapNodeSelect += Events_OnMapNodeSelect;
             Events.OnCardDataCreated += Events_OnCardDataCreated;
-            //Events.OnEntityEnterBackpack += Events_OnEntityEnterBackpack;
+            Events.OnEntityEnterBackpack += Events_OnEntityEnterBackpack;
             //Events.OnUpgradeGained += Events_OnUpgradeGained;
         }
 
         public void UnloadEvents()
         {
             Logger.Log(LogType.Info, "Unloading Events");
+            Events.OnCampaignStart -= Events_OnCampaignStart;
             Events.OnMapNodeSelect -= Events_OnMapNodeSelect;
             Events.OnCardDataCreated -= Events_OnCardDataCreated;
-            //Events.OnEntityEnterBackpack -= Events_OnEntityEnterBackpack;
+            Events.OnEntityEnterBackpack -= Events_OnEntityEnterBackpack;
             //Events.OnUpgradeGained -= Events_OnUpgradeGained;
         }
 
@@ -80,6 +81,10 @@ namespace Wildfrost_Archipelago.Managers
         {
             // Works for cards, not charms
             Logger.Log(LogType.Info, $"Entity Entered Backpack: {card.data?.name ?? "Not a card"}");
+            if (card.name == AssetManager.fullUnitName)
+                ServiceFactory.sessionManager.SendLocationsFound(new int[] { 63000 });
+            else if (card.name == AssetManager.fullItemName)
+                ServiceFactory.sessionManager.SendLocationsFound(new int[] { 53000 });
             References.PlayerData.inventory.deck.Remove(card.data);
         }
 
