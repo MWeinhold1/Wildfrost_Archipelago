@@ -137,76 +137,92 @@
     <Reference Include="Unity.2D.SpriteShape.Runtime">
       <HintPath>DLLs\Unity.2D.SpriteShape.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Addressables">
+    <Reference Include="Unity.Addressables, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.Addressables.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Burst">
-      <HintPath>DLLs\Unity.Burst.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Burst.Unsafe">
-      <HintPath>DLLs\Unity.Burst.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.InternalAPIEngineBridge.001">
+    <Reference Include="Unity.InternalAPIEngineBridge.001, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.InternalAPIEngineBridge.001.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.InternalAPIEngineBridge.013">
+    <Reference Include="Unity.InternalAPIEngineBridge.013, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.InternalAPIEngineBridge.013.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Localization">
+    <Reference Include="Unity.Localization, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.Localization.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Mathematics">
+    <Reference Include="Unity.Mathematics, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.Mathematics.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.MemoryProfiler">
+    <Reference Include="Unity.MemoryProfiler, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.MemoryProfiler.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
+    <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.RenderPipelines.Core.Runtime">
+    <Reference Include="Unity.RenderPipelines.Core.Runtime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
+    <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary">
+    <Reference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.RenderPipelines.Universal.Runtime">
+    <Reference Include="Unity.RenderPipelines.Universal.Runtime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.RenderPipelines.Universal.Shaders">
+    <Reference Include="Unity.RenderPipelines.Universal.Shaders, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.RenderPipelines.Universal.Shaders.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.ResourceManager">
+    <Reference Include="Unity.ResourceManager, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.ResourceManager.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.ScriptableBuildPipeline">
+    <Reference Include="Unity.ScriptableBuildPipeline, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.ScriptableBuildPipeline.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Services.Analytics">
+    <Reference Include="Unity.Services.Analytics, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.Services.Analytics.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Services.Core">
+    <Reference Include="Unity.Services.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.Services.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Services.Core.Analytics">
+    <Reference Include="Unity.Services.Core.Analytics, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.Services.Core.Analytics.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Services.Core.Configuration">
+    <Reference Include="Unity.Services.Core.Configuration, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.Services.Core.Configuration.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Services.Core.Device">
+    <Reference Include="Unity.Services.Core.Device, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.Services.Core.Device.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Services.Core.Environments">
+    <Reference Include="Unity.Services.Core.Environments, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.Services.Core.Environments.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Services.Core.Environments.Internal">
+    <Reference Include="Unity.Services.Core.Environments.Internal, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.Services.Core.Environments.Internal.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Services.Core.Internal">
+    <Reference Include="Unity.Services.Core.Internal, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>DLLs\Unity.Services.Core.Internal.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Services.Core.Networking">
@@ -235,9 +251,6 @@
     </Reference>
     <Reference Include="UnityEngine.AccessibilityModule">
       <HintPath>DLLs\UnityEngine.AccessibilityModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AIModule">
-      <HintPath>DLLs\UnityEngine.AIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AndroidJNIModule">
       <HintPath>DLLs\UnityEngine.AndroidJNIModule.dll</HintPath>
@@ -365,6 +378,14 @@
     <Reference Include="UnityEngine.TilemapModule">
       <HintPath>DLLs\UnityEngine.TilemapModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLLs\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLLs\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Managers\AssetManager.cs" />
@@ -376,6 +397,7 @@
     <Compile Include="Constants\Options.cs" />
     <Compile Include="Interfaces\ISessionManager.cs" />
     <Compile Include="Managers\PoolsManager.cs" />
+    <Compile Include="Managers\UIManager.cs" />
     <Compile Include="ServiceFactory.cs" />
     <Compile Include="WildfrostArchipelago.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

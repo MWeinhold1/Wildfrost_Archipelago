@@ -1,10 +1,13 @@
 ﻿using Deadpan.Enums.Engine.Components.Modding;
 using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Localization;
+using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 namespace Wildfrost_Archipelago
 {
@@ -78,6 +81,71 @@ namespace Wildfrost_Archipelago
             return assets.OfType<T>().ToList();     //Return the correct builders.
         }
 
+        // Code from Snowfall by Jacorb
+        public static void SwitchToSaveProfile(string switchTo, bool copyFiles = false)
+        {
+            SaveSystem.Profile = switchTo;
+            SaveSystem.folderName = SaveSystem.profileFolder + "/" + switchTo;
+            if (SaveSystem.Enabled)
+            {
+                Events.InvokeSaveSystemProfileChanged();
+            }
+
+            var loadFrom = SaveSystem.profileFolder + "/Default";
+            var dir = Directory.GetParent(SaveSystem.settings.FullPath);
+            /*if (!Directory.Exists(dir.FullName + "/" + SaveSystem.folderName) && Directory.Exists(dir.FullName + "/" + loadFrom) && copyFiles)
+            {
+                var innerDir = Directory.CreateDirectory(dir.FullName + "/" + SaveSystem.folderName);
+                var saveFilesToCopy = new string[] { "Campaign", "Battle", "History", "Save", "Stats" };
+
+                foreach (var sf in saveFilesToCopy)
+                {
+                    if (File.Exists(dir + "/" + loadFrom + "/" + sf + ".sav"))
+                    {
+                        File.Copy(dir + "/" + loadFrom + "/" + sf + ".sav", innerDir + "/" + sf + ".sav");
+                    }
+                    if (File.Exists(dir + "/" + loadFrom + "/" + sf + ".sav.bac"))
+                    {
+                        File.Copy(dir + "/" + loadFrom + "/" + sf + ".sav.bac", innerDir + "/" + sf + ".sav.bac");
+                    }
+                }
+            }*/
+        }
+
+        // Code stolen from hopeful_phan's profile manager mod. 
+        /*public void InitUI()
+        {
+            bool flag2 = !ProfileManagerModBehaviour.buttonGroup;
+            if (flag2)
+            {
+                ProfileManagerMod.behaviour = new GameObject("Profile Manager");
+                UnityEngine.Object.DontDestroyOnLoad(ProfileManagerMod.behaviour);
+                ProfileManagerMod.behaviour.hideFlags = (HideFlags.HideInHierarchy | HideFlags.HideInInspector | HideFlags.NotEditable | HideFlags.DontUnloadUnusedAsset);
+                ProfileManagerMod.uiItems = new GameObject("UI Items").transform;
+                ProfileManagerMod.uiItems.SetParent(ProfileManagerMod.behaviour.transform);
+                ProfileManagerMod.uiItems.gameObject.SetActive(false);
+                ProfileManagerModBehaviour e = ProfileManagerMod.behaviour.AddComponent<ProfileManagerModBehaviour>();
+            }
+            ProfileManagerMod.behaviour.SetActive(true);
+            GameObject gameObject = GameObject.Find("Canvas/Safe Area/TopButtons");
+            if (gameObject != null)
+            {
+                gameObject.SetActive(true);
+            }
+            Events.OnSaveSystemProfileChanged += OverallStatsSystem.instance.GameStart;
+            UnityAction unityAction;
+            if ((unityAction = ProfileManagerMod.<> O.< 0 > __OnProfileChanged) == null)
+            {
+                unityAction = (ProfileManagerMod.<> O.< 0 > __OnProfileChanged = new UnityAction(ProfileManagerModBehaviour.OnProfileChanged));
+            }
+            Events.OnSaveSystemProfileChanged += unityAction;
+            UnityAction<Scene> unityAction2;
+            if ((unityAction2 = ProfileManagerMod.<> O.< 1 > __OnSceneChanged) == null)
+            {
+                unityAction2 = (ProfileManagerMod.<> O.< 1 > __OnSceneChanged = new UnityAction<Scene>(ProfileManagerModBehaviour.OnSceneChanged));
+            }
+            Events.OnSceneChanged += unityAction2;
+        }*/
 
 
 
