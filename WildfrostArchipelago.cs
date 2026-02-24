@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
+using Wildfrost_Archipelago.Managers;
 
 namespace Wildfrost_Archipelago
 {
@@ -15,6 +16,7 @@ namespace Wildfrost_Archipelago
     {
         public static WildfrostArchipelago modRef;
         public static bool debugMode = true;
+        public GameObject behaviour;
         public WildfrostArchipelago(string modDirectory) : base(modDirectory)
         {
             modRef = this;
@@ -35,6 +37,7 @@ namespace Wildfrost_Archipelago
             ServiceFactory.Init(debugMode);
             if (!preLoaded) { CreateModAssets(); }
             ServiceFactory.eventManager.LoadEvents();
+            InitUI();
             base.Load();
             Logger.Log(LogType.Info, "Finished Loading Wildfrost Archipelago Mod");
         }
@@ -113,27 +116,28 @@ namespace Wildfrost_Archipelago
         }
 
         // Code stolen from hopeful_phan's profile manager mod. 
-        /*public void InitUI()
+        public void InitUI()
         {
-            bool flag2 = !ProfileManagerModBehaviour.buttonGroup;
+            bool flag2 = !behaviour;
             if (flag2)
             {
-                ProfileManagerMod.behaviour = new GameObject("Profile Manager");
-                UnityEngine.Object.DontDestroyOnLoad(ProfileManagerMod.behaviour);
-                ProfileManagerMod.behaviour.hideFlags = (HideFlags.HideInHierarchy | HideFlags.HideInInspector | HideFlags.NotEditable | HideFlags.DontUnloadUnusedAsset);
-                ProfileManagerMod.uiItems = new GameObject("UI Items").transform;
-                ProfileManagerMod.uiItems.SetParent(ProfileManagerMod.behaviour.transform);
-                ProfileManagerMod.uiItems.gameObject.SetActive(false);
-                ProfileManagerModBehaviour e = ProfileManagerMod.behaviour.AddComponent<ProfileManagerModBehaviour>();
+                behaviour = new GameObject("Archipelago Menu");
+                UnityEngine.Object.DontDestroyOnLoad(behaviour);
+                behaviour.hideFlags = HideFlags.DontUnloadUnusedAsset; //behaviour.hideFlags = (HideFlags.HideInHierarchy | HideFlags.HideInInspector | HideFlags.NotEditable | HideFlags.DontUnloadUnusedAsset);
+                UIManager.uiItems = new GameObject("UI Items").transform;
+                UIManager.uiItems.SetParent(behaviour.transform);
+                UIManager.uiItems.gameObject.SetActive(false);
+                UIManager e = behaviour.AddComponent<UIManager>();
+
             }
-            ProfileManagerMod.behaviour.SetActive(true);
+            behaviour.SetActive(true);
             GameObject gameObject = GameObject.Find("Canvas/Safe Area/TopButtons");
             if (gameObject != null)
             {
                 gameObject.SetActive(true);
             }
-            Events.OnSaveSystemProfileChanged += OverallStatsSystem.instance.GameStart;
-            UnityAction unityAction;
+            //Events.OnSaveSystemProfileChanged += OverallStatsSystem.instance.GameStart;
+            /*UnityAction unityAction;
             if ((unityAction = ProfileManagerMod.<> O.< 0 > __OnProfileChanged) == null)
             {
                 unityAction = (ProfileManagerMod.<> O.< 0 > __OnProfileChanged = new UnityAction(ProfileManagerModBehaviour.OnProfileChanged));
@@ -144,8 +148,8 @@ namespace Wildfrost_Archipelago
             {
                 unityAction2 = (ProfileManagerMod.<> O.< 1 > __OnSceneChanged = new UnityAction<Scene>(ProfileManagerModBehaviour.OnSceneChanged));
             }
-            Events.OnSceneChanged += unityAction2;
-        }*/
+            Events.OnSceneChanged += unityAction2;*/
+        }
 
 
 

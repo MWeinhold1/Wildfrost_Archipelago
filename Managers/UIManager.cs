@@ -41,12 +41,16 @@ namespace Wildfrost_Archipelago.Managers
             apbutton.name = "APButton";
             Button button = apbutton.transform.Find("Animator/Button").GetComponent<Button>();
             apbutton.GetComponent<UINavigationItem>().clickHandler = button.gameObject;
+            apbutton.transform.SetSiblingIndex(3);
             button.onClick = new Button.ButtonClickedEvent();
+            button.onClick.AddListener(delegate ()
+            {
+                uiItems.gameObject.SetActive(true);
+            });
             TextMeshProUGUI textAsset = button.GetComponentInChildren<TextMeshProUGUI>();
-            textAsset.transform.SetLocalX(0.2f);
             textAsset.text = "Archipelago";
 
-            UtilityScript.Update<Component>(textAsset.gameObject.GetComponents<Component>(), delegate (Component c)
+            UtilityScript.Update<Component>(textAsset.gameObject.GetComponents<Component>(), delegate (Component c) // no idea what this does, but im keeping it here i suppose
             {
                 bool flag2 = c is FontSetter || c is LocalizeActionString;
                 if (flag2)
@@ -55,25 +59,8 @@ namespace Wildfrost_Archipelago.Managers
                 }
             });
 
-            /*UIManager.buttonPrefab = UnityEngine.Object.Instantiate<RectTransform>(Addressables.LoadAssetAsync<GameObject>("Event-Item").WaitForCompletion().GetComponent<ItemEventRoutine>().skipButton.transform.parent.parent as RectTransform, uiItems);
-            UIManager.buttonPrefab.gameObject.GetOrAdd<LayoutLink>().enabled = false;
-            UIManager.buttonPrefab.gameObject.GetOrAdd<LinkEnable>().enabled = false;
-            TextFitter fitter = UIManager.buttonPrefab.GetComponentInChildren<TextMeshProUGUI>().gameObject.GetOrAdd<TextFitter>();
-            fitter.transforms = new RectTransform[]
-            {
-                UIManager.buttonPrefab.transform as RectTransform
-            };
-            TextMeshProUGUI textAsset2 = UIManager.buttonPrefab.Find("Animator/Button").GetComponentInChildren<TextMeshProUGUI>();
-            textAsset2.gameObject.GetOrAdd<LocalizeStringEvent>().enabled = false;
-            textAsset2.text = "Button";
-            textAsset2.maskable = true;
-            yield return fitter.FitRoutine();
-            Image image = UIManager.buttonPrefab.Find("Animator/Button").GetComponent<Image>();
-            image.material = image.defaultMaterial;
-            image.maskable = true;
-            UIManager.buttonPrefab.GetComponentInChildren<ButtonAnimator>().interactable = true;
-            UIManager.buttonPrefab.gameObject.SetActive(true);
-            UIManager.OnSceneChanged(SceneManager.GetActive());*/
+            StartCoroutine(InitMenu());
+
             yield break;
         }
 
@@ -86,195 +73,38 @@ namespace Wildfrost_Archipelago.Managers
                 GameObject apbutton = UnityEngine.Object.Instantiate<GameObject>(modsbutton, modsbutton.transform.position, Quaternion.identity, modsbutton.transform.parent);
                 apbutton.transform.SetLocalY(4.5f);
                 apbutton.name = "APButton";
-                /*
-                UIManager.textAsset = apbutton.GetComponentInChildren<TextMeshProUGUI>();
-                UIManager.textAsset.text = "Profile: " + SaveSystem.Profile;*/
                 Button button = apbutton.transform.Find("Animator/Button").GetComponent<Button>();
                 apbutton.GetComponent<UINavigationItem>().clickHandler = button.gameObject;
                 button.onClick.AddListener(delegate ()
                 {
-                    CoroutineManager.Start(UIManager.OnClick());
+                    uiItems.gameObject.SetActive(true);
                 });
             }
         }
 
-        // FROM THIS POINT ONWARD I HAVEN'T MODIFIED THE CODE TO FIT OUR NEEDS YET
-
-        public static IEnumerator OnClick()
+        public static IEnumerator InitMenu()
         {
-            yield return SceneManager.Load("Mods", 2, null);
-            UIManager.editing = false;
-            UIManager.modsSceneManager = UnityEngine.Object.FindObjectOfType<ModsSceneManager>();
-            bool flag = !UIManager.modPrefab;
-            if (flag)
-            {
-                UIManager.modPrefab = UnityEngine.Object.Instantiate<GameObject>(UIManager.modsSceneManager.ModPrefab, uiItems);
-                GameObject buttonLayout = new GameObject("Editor Buttons", new Type[]
-                {
-                    typeof(VerticalLayoutGroup),
-                    typeof(ContentSizeFitter)
-                });
-                (buttonLayout.transform as RectTransform).SetSize(UtilityScript.FindObject(UIManager.modPrefab, "Buttons").transform as RectTransform);
-                buttonLayout.transform.SetParent(UIManager.modPrefab.transform);
-                buttonLayout.transform.SetLocalPositionAndRotation(new Vector2(3.5f, 0.8f), Quaternion.identity);
-                buttonLayout.transform.localScale = new Vector3(0.8f, 0.8f, 1f);
-                VerticalLayoutGroup layout = buttonLayout.GetComponent<VerticalLayoutGroup>();
-                layout.childAlignment = TextAnchor.UpperCenter;
-                layout.childControlHeight = false;
-                layout.childControlWidth = false;
-                foreach (string text in new string[]
-                {
-                    "Duplicate",
-                    "Delete"
-                })
-                {
-                    RectTransform button = UnityEngine.Object.Instantiate<RectTransform>(UIManager.buttonPrefab, buttonLayout.transform);
-                    button.name = text;
-                    Transform buttonTransform = button.Find("Animator/Button");
-                    buttonTransform.GetComponentInChildren<TextMeshProUGUI>().SetText(text, true);
-                    buttonTransform.GetComponent<Button>().onClick = new Button.ButtonClickedEvent();
-                    button = null;
-                    buttonTransform = null;
-                    //text = null;
-                }
-                string[] array = null;
-                buttonLayout.SetActive(false);
-                yield return null;
-                buttonLayout = null;
-                layout = null;
-            }
-            UIManager.scrollView = UIManager.modsSceneManager.Content.transform.parent.parent;
-            UIManager.content = UIManager.scrollView.Find("Viewport/Content");
-            UIManager.content.DestroyAllChildren();
-            UIManager.profileHolders.Clear();
-            foreach (string dir in ES3.GetDirectories(SaveSystem.profileFolder))
-            {
-                UnityEngine.Debug.LogWarning(dir);
-                UIManager.Run(dir);
-                //dir = null;
-            }
-            string[] array2 = null;
-            UIManager.CreateMainEditButton();
-            UIManager.CreateNewProfileButton();
-            yield break;
-        }
-
-        public static void Run(string profileName = "Default")
-        {
-            GameObject gameObject = UIManager.modPrefab.InstantiateKeepName<GameObject>();
-            gameObject.transform.SetParent(UIManager.content);
-            bool flag = profileName.StartsWith("Default");
-            if (flag)
-            {
-                gameObject.transform.SetAsFirstSibling();
-            }
-            gameObject.transform.SetLocalZ(0f);
-            gameObject.transform.localScale = Vector3.one;
-            gameObject.transform.localRotation = Quaternion.identity;
-            ModHolder holder = gameObject.GetComponentInChildren<ModHolder>();
-            //holder.Mod = new UIManager.ProfileDisplay(profileName, holder);
-            holder.Mod.Load();
-            holder.UpdateInfo();
-            UIManager.profileHolders.Add(holder);
-            Button selector = holder.bellRinger.transform.Find("Button (Base)/Animator/Button").GetComponent<Button>();
-            selector.onClick = new Button.ButtonClickedEvent();
-            /*selector.onClick.AddListener(delegate ()
-            {
-                UIManager.ProfileDisplay.Select(holder);
-            });*/
-        }
-
-        // Token: 0x0600001C RID: 28 RVA: 0x000027F0 File Offset: 0x000009F0
-        private void Update()
-        {
-            bool flag = !UIManager.promptToggleEditor;
-            if (!flag)
-            {
-                UIManager.promptToggleEditor = false;
-                this.Toggle();
-            }
-        }
-
-        public void Toggle()
-        {
-            UIManager.editing = !UIManager.editing;
-            foreach (ModHolder holder in UIManager.profileHolders)
-            {
-                UtilityScript.FindObject(holder.gameObject, "Editor Buttons").SetActive(UIManager.editing);
-                UtilityScript.FindObject(holder.gameObject, "Buttons").SetActive(!UIManager.editing);
-            }
-            UnityEngine.Debug.LogWarning("[Profile Manager] Editing? " + UIManager.editing.ToString());
-        }
-
-        public static void CreateMainEditButton()
-        {
-            Transform parent = UIManager.content.root.Find("SafeArea/Menu");
-            GameObject editButton = UnityEngine.Object.Instantiate<GameObject>(UIManager.editButtonPrefab, parent.transform);
-            editButton.transform.localRotation = Quaternion.identity;
-            editButton.transform.localPosition = parent.Find("Back Button").localPosition.WithY(1.5f);
-            Button button = editButton.transform.Find("Animator/Button").GetComponent<Button>();
-            button.onClick.AddListener(delegate ()
-            {
-                UIManager.promptToggleEditor = true;
+            // for whatever reason loading the mods scene manually and then unloading it breaks the mods button and the back-out button on the mods scene and I have no idea why so im doing this really stupid method instead.
+            GameObject.Find("Canvas/Safe Area/Menu/ButtonLayout/ModsButton/Animator/Button").GetComponent<Button>().onClick.Invoke();
+            yield return new WaitUntil(() => SceneManager.IsLoaded("Mods"));
+            GameObject canvas = UnityEngine.SceneManagement.SceneManager.GetSceneByName("Mods").GetRootGameObjects().Single(obj => obj.GetComponent<WorldSpaceCanvasFitScreen>() != null);
+            canvas.transform.FindRecursive("Back Button").Find("Animator/Button").GetComponent<Button>().onClick.Invoke();
+            GameObject APCanvas = canvas.InstantiateKeepName();
+            APCanvas.transform.SetParent(uiItems.transform);
+            content = APCanvas.transform.FindRecursive("Content");
+            content.DestroyAllChildren();
+            Button backButton = APCanvas.transform.FindRecursive("Back Button").Find("Animator/Button").GetComponent<Button>();
+            backButton.onClick.RemoveAllListeners();
+            backButton.onClick.AddListener(delegate () {
+                uiItems.gameObject.SetActive(false);
             });
-            TextMeshProUGUI textAsset = button.GetComponentInChildren<TextMeshProUGUI>();
-            textAsset.transform.SetLocalX(0.2f);
-            textAsset.text = "Toggle Edit";
+
+            // CODE THAT ADDS THE ACTUAL CONTENT OF THE MENU WOULD GO HERE
         }
 
-        public static void CreateNewProfileButton()
-        {
-            Transform parent = UIManager.content.root.Find("SafeArea/Menu");
-            GameObject editButton = UnityEngine.Object.Instantiate<GameObject>(UIManager.editButtonPrefab, parent.transform);
-            editButton.transform.localRotation = Quaternion.identity;
-            editButton.transform.localPosition = parent.Find("Back Button").localPosition.WithY(2.5f);
-            Button button = editButton.transform.Find("Animator/Button").GetComponent<Button>();
-            UnityEvent onClick = button.onClick;
-            UnityAction call;
-            if ((call = UIManager.<> O.< 0 > __CreateNewProfile) == null)
-            {
-                call = (UIManager.<> O.< 0 > __CreateNewProfile = new UnityAction(UIManager.CreateNewProfile));
-            }
-            onClick.AddListener(call);
-            TextMeshProUGUI textAsset = button.GetComponentInChildren<TextMeshProUGUI>();
-            textAsset.transform.SetLocalX(0.2f);
-            textAsset.text = "New Profile";
-        }
-
-        private static void CreateNewProfile()
-        {
-            string date = DateTime.Today.ToShortDateString().Replace('/', '.');
-            string newFolderName = "Default - " + date;
-            bool flag = ES3.DirectoryExists(newFolderName);
-            if (flag)
-            {
-                int i = 1;
-                while (ES3.DirectoryExists(string.Format("{0} #{1}", newFolderName, i)))
-                {
-                    i++;
-                }
-                newFolderName = string.Format("{0} #{1}", newFolderName, i);
-            }
-            SaveSystem.SetProfile(newFolderName, true);
-            CoroutineManager.Start(SceneManager.Unload("Mods"));
-        }
-
-        public static bool editing = false;
-        public static bool promptToggleEditor = false;
-        public static TextMeshProUGUI textAsset = null;
-        public static GameObject editButtonPrefab = null;
         public static Transform scrollView = null;
         public static Transform content = null;
-        public static ModsSceneManager modsSceneManager = null;
         public static GameObject modPrefab = null;
         public static RectTransform buttonPrefab = null;
-        public static List<ModHolder> profileHolders = new List<ModHolder>();
-
-        /*[CompilerGenerated]
-        private static class <>O
-		{
-			public static UnityAction<0> __OnProfileChanged;
-            public static UnityAction<Scene> <1>__OnSceneChanged;
-		}*/
     }
 }
