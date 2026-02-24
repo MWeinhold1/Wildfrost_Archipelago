@@ -4,8 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine.Localization.SmartFormat.Utilities;
+using static ES3;
 
 namespace Wildfrost_Archipelago.Managers
 {
@@ -81,10 +83,41 @@ namespace Wildfrost_Archipelago.Managers
         {
             // Works for cards, not charms
             Logger.Log(LogType.Info, $"Entity Entered Backpack: {card.data?.name ?? "Not a card"}");
+            ClassData tribe = References.PlayerData.classData;
             if (card.name == AssetManager.fullUnitName)
-                ServiceFactory.sessionManager.SendLocationsFound(new int[] { 63000 });
+            {
+                int[] locations = new int[1];
+                switch (tribe.name)
+                {
+                    case "Basic":
+                        locations[0] = 60000;
+                        break;
+                    case "Magic":
+                        locations[0] = 61000;
+                        break;
+                    case "Clunk":
+                        locations[0] = 62000;
+                        break;
+                }
+                ServiceFactory.sessionManager.SendLocationsFound(locations);
+            }
             else if (card.name == AssetManager.fullItemName)
-                ServiceFactory.sessionManager.SendLocationsFound(new int[] { 53000 });
+            {
+                int[] locations = new int[1];
+                switch (tribe.name)
+                {
+                    case "Basic":
+                        locations[0] = 50000;
+                        break;
+                    case "Magic":
+                        locations[0] = 51000;
+                        break;
+                    case "Clunk":
+                        locations[0] = 52000;
+                        break;
+                }
+                ServiceFactory.sessionManager.SendLocationsFound(locations);
+            }
             References.PlayerData.inventory.deck.Remove(card.data);
         }
 
@@ -103,10 +136,11 @@ namespace Wildfrost_Archipelago.Managers
             SaveCollection<string> saveCollection = node.campaignNode.data.Get<SaveCollection<string>>("cards");
             foreach (int num3 in saveCollection.collection.GetIndices<string>().InRandomOrder<int>())
             {
-                if (rand.Next(0, 100) >= 50)
+                CardData item = ServiceFactory.poolsManager.PullItem();
+                if (rand.Next(0, 100) >= 50 || item == null)
                     saveCollection[num3] = name;
                 else
-                    saveCollection[num3] = ServiceFactory.poolsManager.PullItem().name;
+                    saveCollection[num3] = item.name;
 
                 if (node.campaignNode.data.ContainsKey(string.Format("upgrades{0}", num3)))
                     node.campaignNode.data.Remove(string.Format("upgrades{0}", num3));
@@ -146,10 +180,11 @@ namespace Wildfrost_Archipelago.Managers
             SaveCollection<string> saveCollection = node.campaignNode.data.Get<SaveCollection<string>>("cards");
             foreach (int num3 in saveCollection.collection.GetIndices<string>().InRandomOrder<int>())
             {
-                if (rand.Next(0, 100) >= 50)
+                CardData unit = ServiceFactory.poolsManager.PullUnit();
+                if (rand.Next(0, 100) >= 50 || unit == null)
                     saveCollection[num3] = name;
                 else
-                    saveCollection[num3] = ServiceFactory.poolsManager.PullUnit().name;
+                    saveCollection[num3] = unit.name;
 
                 if (node.campaignNode.data.ContainsKey(string.Format("upgrades{0}", num3)))
                     node.campaignNode.data.Remove(string.Format("upgrades{0}", num3));
@@ -163,10 +198,11 @@ namespace Wildfrost_Archipelago.Managers
                 return;
             string name = AssetManager.fullCharmName;
             Random rand = new Random();
-            if (rand.Next(0, 100) >= 50)
+            CardUpgradeData charm = ServiceFactory.poolsManager.PullCharm();
+            if (rand.Next(0, 100) >= 50 || charm == null)
                 node.campaignNode.data["charm"] = name;
             else
-                node.campaignNode.data["charm"] = ServiceFactory.poolsManager.PullItem().name;
+                node.campaignNode.data["charm"] = charm.name;
             node.campaignNode.data.Add("AP_mod", true);
         }
 

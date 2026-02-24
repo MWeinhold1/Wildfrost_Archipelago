@@ -27,6 +27,7 @@ namespace Wildfrost_Archipelago.Constants
         filler = 0,
         building = 10,
         tribe = 20,
+        pet = 30,
         common_item = 50,
         snow_item = 51,
         shade_item = 52,
@@ -55,6 +56,8 @@ namespace Wildfrost_Archipelago.Constants
                     return APItemConstants.Buildings[id];
                 case "20":
                     return APItemConstants.Tribes[id];
+                case "30":
+                    return APItemConstants.Pets[id];
                 case "50":
                     return APItemConstants.CommonItems[id];
                 case "51":
@@ -101,8 +104,20 @@ namespace Wildfrost_Archipelago.Constants
 
         public static Dictionary<long, APItem> Tribes = new Dictionary<long, APItem>
         {
-            {20000, new APItem(20000, 20, "Magic", "Shademancers")},
-            {20001, new APItem(20001, 20, "Clunk", "Clunkmasters")},
+            {20000, new APItem(20000, 20, "Basic", "Snowdwellers")},
+            {20001, new APItem(20001, 20, "Magic", "Shademancers")},
+            {20002, new APItem(20002, 20, "Clunk", "Clunkmasters")},
+        };
+
+        public static Dictionary<long, APItem> Pets = new Dictionary<long, APItem>
+        {
+            {30000, new APItem(30000, 30, "Wolfie", "Snoof")},
+            {30001, new APItem(30001, 30, "BerryPet", "Booshu")},
+            {30002, new APItem(30002, 30, "DemonPet", "Loki")},
+            {30003, new APItem(30003, 30, "DrawPet", "Sneezle")},
+            {30004, new APItem(30004, 30, "Jagzag", "Spike")},
+            {30005, new APItem(30005, 30, "InkPet", "Binku")},
+            {30006, new APItem(30006, 30, "BoostPet", "Lil' Gazi")},
         };
 
         public static Dictionary<long, APItem> CommonItems = new Dictionary<long, APItem>

@@ -210,15 +210,12 @@ namespace Wildfrost_Archipelago.Constants
             {50000, new APLocation(50000, 5, "Snowdweller Card", true)},
             {51000, new APLocation(51000, 5, "Shademancer Card", true)},
             {52000, new APLocation(52000, 5, "Clunkmaster Card", true)},
-            {53000, new APLocation(53000, 5, "Common Card", true)},
             {60000, new APLocation(60000, 6, "Snowdweller Companion", true)},
             {61000, new APLocation(61000, 6, "Shademancer Companion", true)},
             {62000, new APLocation(62000, 6, "Clunkmaster Companion", true)},
-            {63000, new APLocation(63000, 6, "Common Companion", true)},
             {70000, new APLocation(70000, 7, "Snowdweller Charm", true)},
             {71000, new APLocation(71000, 7, "Shademancer Charm", true)},
             {72000, new APLocation(72000, 7, "Clunkmaster Charm", true)},
-            {73000, new APLocation(73000, 7, "Common Charm", true)},
             {80000, new APLocation(80000, 8, "Boss Reward Bell", true)}
         };
     }

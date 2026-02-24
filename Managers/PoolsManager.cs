@@ -82,6 +82,8 @@ namespace Wildfrost_Archipelago.Managers
                 return ItemPool.TakeRandom();
             else
             {
+                if (AllItems.Where(item => item.APID.ToString()[0] == '5').Count() <= 0)
+                    return null;
                 PopulatePool('5');
                 return ItemPool.TakeRandom();
             }
@@ -92,6 +94,8 @@ namespace Wildfrost_Archipelago.Managers
                 return UnitPool.TakeRandom();
             else
             {
+                if (AllItems.Where(item => item.APID.ToString()[0] == '6').Count() <= 0)
+                    return null;
                 PopulatePool('6');
                 return UnitPool.TakeRandom();
             }
@@ -102,7 +106,9 @@ namespace Wildfrost_Archipelago.Managers
                 return CharmPool.TakeRandom();
             else
             {
-                PopulatePool('6');
+                if (AllItems.Where(item => item.APID.ToString()[0] == '7').Count() <= 0)
+                    return null;
+                PopulatePool('7');
                 return CharmPool.TakeRandom();
             }
         }
