@@ -88,7 +88,6 @@ namespace Wildfrost_Archipelago.Managers
             GameObject.Find("Canvas/Safe Area/Menu/ButtonLayout/ModsButton/Animator/Button").GetComponent<Button>().onClick.Invoke();
             yield return new WaitUntil(() => SceneManager.IsLoaded("Mods"));
             GameObject canvas = UnityEngine.SceneManagement.SceneManager.GetSceneByName("Mods").GetRootGameObjects().Single(obj => obj.GetComponent<WorldSpaceCanvasFitScreen>() != null);
-            canvas.transform.FindRecursive("Back Button").Find("Animator/Button").GetComponent<Button>().onClick.Invoke();
             GameObject APCanvas = canvas.InstantiateKeepName();
             APCanvas.transform.SetParent(uiItems.transform);
             content = APCanvas.transform.FindRecursive("Content");
@@ -100,6 +99,14 @@ namespace Wildfrost_Archipelago.Managers
             });
 
             // CODE THAT ADDS THE ACTUAL CONTENT OF THE MENU WOULD GO HERE
+
+            // if we don't wait for a couple of frames (im not sure how many are necessary but 1 is not enough) then the unload will just fail for some reason and we'll be stuck with the mods menu on screen and unable to unload it via the button
+            // i think it might be because the timing just so happens to line up that we're trying to unload the mods scene at the same time the game is trying to access save data and stuff gets janky? unsure
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            canvas.transform.FindRecursive("Back Button").Find("Animator/Button").GetComponent<Button>().onClick.Invoke();
         }
 
         public static Transform scrollView = null;
