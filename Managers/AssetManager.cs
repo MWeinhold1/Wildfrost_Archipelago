@@ -29,7 +29,7 @@ namespace Wildfrost_Archipelago.Managers
             Logger.Log(LogType.Info, "Getting item card builder");
             Random rng = new Random();
             return new CardDataBuilder(WildfrostArchipelago.modRef).CreateItem(internalItemName, "Archi-fact")
-                .SetSprites("Archi-fact.png", "Archi-fact.png")
+                .SetSprites("theballs.png", "Archi-fact.png")
                 .WithCardType("Item")
                 .WithPlayType(Card.PlayType.None)
                 .WithValue(rng.Next(20, 70))
@@ -45,7 +45,7 @@ namespace Wildfrost_Archipelago.Managers
         {
             Logger.Log(LogType.Info, "Getting unit card builder");
             return new CardDataBuilder(WildfrostArchipelago.modRef).CreateUnit(internalUnitName, "Archi-fact")
-                .SetSprites("Archi-fact.png", "Archi-fact.png")
+                .SetSprites("theballs.png", "Archi-fact.png")
                 .WithCardType("Friendly")
                 .SetStats(null, null, 0)
                 .SubscribeToAfterAllBuildEvent((card) =>
@@ -62,7 +62,7 @@ namespace Wildfrost_Archipelago.Managers
 
             return new CardUpgradeDataBuilder(WildfrostArchipelago.modRef).Create(internalCharmName)
                 .WithType(CardUpgradeData.Type.Charm)
-                .WithImage("Archi-fact.png")
+                .WithImage("theballs.png")
                 .WithTitle("Archipelago Item")
                 .WithText("Archipelago Check");
         }

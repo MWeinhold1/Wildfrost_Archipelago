@@ -14,6 +14,9 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.Events;
 using UnityEngine.Localization.Components;
 using UnityEngine.SceneManagement;
+using System.ComponentModel;
+using HarmonyLib;
+using UnityEngine.TextCore.Text;
 
 namespace Wildfrost_Archipelago.Managers
 {
@@ -50,14 +53,15 @@ namespace Wildfrost_Archipelago.Managers
             TextMeshProUGUI textAsset = button.GetComponentInChildren<TextMeshProUGUI>();
             textAsset.text = "Archipelago";
 
-            UtilityScript.Update<Component>(textAsset.gameObject.GetComponents<Component>(), delegate (Component c) // no idea what this does, but im keeping it here i suppose
+
+            foreach (UnityEngine.Component c in textAsset.GetComponents<UnityEngine.Component>())
             {
                 bool flag2 = c is FontSetter || c is LocalizeActionString;
                 if (flag2)
                 {
                     c.Destroy();
                 }
-            });
+            }
 
             StartCoroutine(InitMenu());
 
@@ -92,13 +96,60 @@ namespace Wildfrost_Archipelago.Managers
             APCanvas.transform.SetParent(uiItems.transform);
             content = APCanvas.transform.FindRecursive("Content");
             content.DestroyAllChildren();
+            content.GetComponent<VerticalLayoutGroup>().childAlignment = TextAnchor.UpperCenter;
             Button backButton = APCanvas.transform.FindRecursive("Back Button").Find("Animator/Button").GetComponent<Button>();
             backButton.onClick.RemoveAllListeners();
             backButton.onClick.AddListener(delegate () {
                 uiItems.gameObject.SetActive(false);
             });
 
-            // CODE THAT ADDS THE ACTUAL CONTENT OF THE MENU WOULD GO HERE
+            string sceneToCopyFrom = "UI";
+            bool isLoaded = SceneManager.IsLoaded(sceneToCopyFrom);
+            bool flag2 = !isLoaded;
+            if (flag2 && renameSeq == null)
+            {
+                UIManager.PatchRenameButton.initialising = true;
+                UnityEngine.SceneManagement.SceneManager.LoadScene(sceneToCopyFrom, LoadSceneMode.Additive);
+                UnityEngine.SceneManagement.SceneManager.sceneLoaded += GetRenameButton;
+            }
+            yield return new WaitUntil(() => renameSeq != null);
+
+            GameObject hostLabel = text.InstantiateKeepName();
+            hostLabel.name = "Host Label";
+            hostLabel.transform.SetParent(content);
+            hostLabel.GetComponent<TMPro.TextMeshProUGUI>().SetText("Host Address");
+
+            GameObject host = renameSeq.InstantiateKeepName();
+            host.name = "Host Text Field";
+            host.transform.SetParent(content);
+            host.GetComponent<RectTransform>().anchoredPosition = new Vector2(5.5f, 1);
+            host.SetActive(true);
+
+            GameObject slotLabel = text.InstantiateKeepName();
+            slotLabel.name = "Player Slot Label";
+            slotLabel.transform.SetParent(content);
+            slotLabel.GetComponent<TMPro.TextMeshProUGUI>().SetText("Player Slot");
+
+            GameObject slot = renameSeq.InstantiateKeepName();
+            slot.name = "Player Slot Text Field";
+            slot.transform.SetParent(content);
+            slot.GetComponent<RectTransform>().anchoredPosition = new Vector2(5.5f, 1);
+            slot.SetActive(true);
+
+            GameObject passwordLabel = text.InstantiateKeepName();
+            passwordLabel.name = "Password Label";
+            passwordLabel.transform.SetParent(content);
+            passwordLabel.GetComponent<TMPro.TextMeshProUGUI>().SetText("Password");
+
+            GameObject password = renameSeq.InstantiateKeepName();
+            password.name = "Password Text Field";
+            password.transform.SetParent(content);
+            password.GetComponent<RectTransform>().anchoredPosition = new Vector2(5.5f, 1);
+            password.SetActive(true);
+
+            confirmButton.transform.SetAsLastSibling();
+
+            renameSeq.transform.SetLocalX(7);
 
             // if we don't wait for a couple of frames (im not sure how many are necessary but 1 is not enough) then the unload will just fail for some reason and we'll be stuck with the mods menu on screen and unable to unload it via the button
             // i think it might be because the timing just so happens to line up that we're trying to unload the mods scene at the same time the game is trying to access save data and stuff gets janky? unsure
@@ -107,8 +158,66 @@ namespace Wildfrost_Archipelago.Managers
             yield return new WaitForEndOfFrame();
             yield return new WaitForEndOfFrame();
             canvas.transform.FindRecursive("Back Button").Find("Animator/Button").GetComponent<Button>().onClick.Invoke();
+
+            yield break;
         }
 
+        public static void GetRenameButton(Scene scene, LoadSceneMode mode)
+        {
+            if (scene.name != "UI")
+                return;
+
+            renameSeq = MonoBehaviourSingleton<Deckpack>.instance.transform.root.FindRecursive("Rename Card").Find("Rename").gameObject.InstantiateKeepName<GameObject>();
+            UnityEngine.Object.DontDestroyOnLoad(renameSeq);
+            renameSeq.SetActive(false);
+            renameSeq.GetComponentInChildren<TMP_InputField>().characterLimit = 0;
+
+            confirmButton = MonoBehaviourSingleton<Deckpack>.instance.transform.root.FindRecursive("Rename Card").Find("Confirm Button").gameObject.InstantiateKeepName();
+            UnityEngine.Object.DontDestroyOnLoad(confirmButton);
+            Button button = confirmButton.transform.Find("Animator/Button").GetComponent<Button>();
+            button.onClick.RemoveAllListeners();
+            button.onClick.AddListener(delegate () {
+                TryConnect();
+            });
+            text = button.gameObject.GetComponentInChildren<TextMeshProUGUI>().gameObject;
+            text.GetComponent<TMPro.TextMeshProUGUI>().SetText("Connect");
+            confirmButton.transform.SetParent(content);
+
+            foreach (UnityEngine.Component c in text.GetComponents<UnityEngine.Component>())
+            {
+                bool flag2 = c is FontSetter || c is LocalizeActionString;
+                if (flag2)
+                {
+                    c.Destroy();
+                }
+            }
+
+            UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync("UI");
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded -= GetRenameButton;
+            UIManager.PatchRenameButton.initialising = false;
+            UIManager.PatchRenameButton.initialised = true;
+        }
+
+        public static void TryConnect()
+        {
+
+        }
+
+        [HarmonyPatch(typeof(ModifierDisplayCurrent), "OnEnable")]
+        internal class PatchRenameButton
+        {
+            private static bool Prefix()
+            {
+                return !UIManager.PatchRenameButton.initialising;
+            }
+            public static bool initialising;
+
+            public static bool initialised;
+        }
+
+        public static GameObject text = null;
+        public static GameObject confirmButton = null;
+        public static GameObject renameSeq = null;
         public static Transform scrollView = null;
         public static Transform content = null;
         public static GameObject modPrefab = null;
