@@ -14,6 +14,7 @@ namespace Wildfrost_Archipelago.Archipelago
     {
         public bool StartSession(string uriAndPort, string slotName, string password)
         {
+            Logger.Log(LogType.Info, "STARTING A MOCK SESSION WITH PARAMETERS: " + uriAndPort + " ; " + slotName + " ; " + password);
             return true;
         }
 

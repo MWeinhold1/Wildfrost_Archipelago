@@ -138,6 +138,7 @@ namespace Wildfrost_Archipelago.Managers
             host.name = "Host Text Field";
             host.transform.SetParent(content);
             host.GetComponent<RectTransform>().anchoredPosition = new Vector2(5.5f, 1);
+            uriAndPort = host.GetComponentInChildren<TMP_InputField>();
             host.SetActive(true);
 
             GameObject slotLabel = hostLabel.InstantiateKeepName();
@@ -149,6 +150,7 @@ namespace Wildfrost_Archipelago.Managers
             slot.name = "Player Slot Text Field";
             slot.transform.SetParent(content);
             slot.GetComponent<RectTransform>().anchoredPosition = new Vector2(5.5f, 1);
+            playerSlot = slot.GetComponentInChildren<TMP_InputField>();
             slot.SetActive(true);
 
             GameObject passwordLabel = hostLabel.InstantiateKeepName();
@@ -156,11 +158,12 @@ namespace Wildfrost_Archipelago.Managers
             passwordLabel.transform.SetParent(content);
             passwordLabel.GetComponent<TMPro.TextMeshProUGUI>().SetText("Password");
 
-            GameObject password = renameSeq.InstantiateKeepName();
-            password.name = "Password Text Field";
-            password.transform.SetParent(content);
-            password.GetComponent<RectTransform>().anchoredPosition = new Vector2(5.5f, 1);
-            password.SetActive(true);
+            GameObject passwordField = renameSeq.InstantiateKeepName();
+            passwordField.name = "Password Text Field";
+            passwordField.transform.SetParent(content);
+            passwordField.GetComponent<RectTransform>().anchoredPosition = new Vector2(5.5f, 1);
+            password = passwordField.GetComponentInChildren<TMP_InputField>();
+            passwordField.SetActive(true);
 
             confirmButton.transform.SetAsLastSibling();
 
@@ -224,7 +227,7 @@ namespace Wildfrost_Archipelago.Managers
 
         public static void TryConnect()
         {
-
+            ServiceFactory.sessionManager.StartSession(uriAndPort.text, playerSlot.text, password.text);
         }
 
         [HarmonyPatch(typeof(ModifierDisplayCurrent), "OnEnable")]
@@ -239,6 +242,9 @@ namespace Wildfrost_Archipelago.Managers
             public static bool initialised;
         }
 
+        public static TMP_InputField uriAndPort = null;
+        public static TMP_InputField playerSlot = null;
+        public static TMP_InputField password = null;
         public static GameObject text = null;
         public static GameObject confirmButton = null;
         public static GameObject renameSeq = null;
