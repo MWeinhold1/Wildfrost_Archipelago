@@ -9,6 +9,8 @@ using UnityEngine.Localization;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using Wildfrost_Archipelago.Managers;
+using static UnityEngine.Rendering.DebugUI;
+
 
 namespace Wildfrost_Archipelago
 {
@@ -17,6 +19,7 @@ namespace Wildfrost_Archipelago
         public static WildfrostArchipelago modRef;
         public static bool debugMode = true;
         public GameObject behaviour;
+        public static string oldProfile;
         public WildfrostArchipelago(string modDirectory) : base(modDirectory)
         {
             modRef = this;
@@ -38,6 +41,7 @@ namespace Wildfrost_Archipelago
             if (!preLoaded) { CreateModAssets(); }
             ServiceFactory.eventManager.LoadEvents();
             InitUI();
+            Events.OnSceneChanged += UIManager.OnSceneChanged;
             base.Load();
             Logger.Log(LogType.Info, "Finished Loading Wildfrost Archipelago Mod");
         }
@@ -45,6 +49,11 @@ namespace Wildfrost_Archipelago
         public override void Unload()
         {
             UnloadFromClasses();
+            if (oldProfile != null)
+                SwitchToSaveProfile(oldProfile);
+            Events.OnSceneChanged -= UIManager.OnSceneChanged;
+            UIManager.Unload();
+            behaviour.Destroy();
             base.Unload();
         }
         #endregion
@@ -87,15 +96,18 @@ namespace Wildfrost_Archipelago
         // Code from Snowfall by Jacorb
         public static void SwitchToSaveProfile(string switchTo, bool copyFiles = false)
         {
-            SaveSystem.Profile = switchTo;
+            var lastMods = SaveSystem.LoadProgressData<string[]>("lastSavedMods");
+            oldProfile = SaveSystem.GetProfile();
+            SaveSystem.SetProfile(switchTo);
             SaveSystem.folderName = SaveSystem.profileFolder + "/" + switchTo;
+            SaveSystem.SaveProgressData<string[]>("lastSavedMods", lastMods);
             if (SaveSystem.Enabled)
             {
                 Events.InvokeSaveSystemProfileChanged();
             }
 
-            var loadFrom = SaveSystem.profileFolder + "/Default";
-            var dir = Directory.GetParent(SaveSystem.settings.FullPath);
+            //var loadFrom = SaveSystem.profileFolder + "/Default";
+            //var dir = Directory.GetParent(SaveSystem.settings.FullPath);
             /*if (!Directory.Exists(dir.FullName + "/" + SaveSystem.folderName) && Directory.Exists(dir.FullName + "/" + loadFrom) && copyFiles)
             {
                 var innerDir = Directory.CreateDirectory(dir.FullName + "/" + SaveSystem.folderName);
@@ -128,14 +140,13 @@ namespace Wildfrost_Archipelago
                 UIManager.uiItems.SetParent(behaviour.transform);
                 UIManager.uiItems.gameObject.SetActive(false);
                 UIManager e = behaviour.AddComponent<UIManager>();
-
+                behaviour.SetActive(true);
             }
-            behaviour.SetActive(true);
-            GameObject gameObject = GameObject.Find("Canvas/Safe Area/TopButtons");
-            if (gameObject != null)
-            {
-                gameObject.SetActive(true);
-            }
+            //GameObject gameObject = GameObject.Find("Canvas/Safe Area/TopButtons");
+            //if (gameObject != null)
+            //{
+            //    gameObject.SetActive(true);
+            //}
             //Events.OnSaveSystemProfileChanged += OverallStatsSystem.instance.GameStart;
             /*UnityAction unityAction;
             if ((unityAction = ProfileManagerMod.<> O.< 0 > __OnProfileChanged) == null)

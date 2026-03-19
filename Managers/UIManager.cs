@@ -25,9 +25,11 @@ namespace Wildfrost_Archipelago.Managers
     {
         public static Transform uiItems;
         public static GameObject apbutton = null;
+        public static UIManager self;
 
         internal void Start()
         {
+            self = this;
             base.StartCoroutine(this.Initialize());
         }
 
@@ -70,9 +72,18 @@ namespace Wildfrost_Archipelago.Managers
 
         public static void OnSceneChanged(Scene scene)
         {
-            bool flag = scene.name == "MainMenu" && !apbutton;
+            bool flag = scene.name == "MainMenu";
             if (flag)
+                self.StartCoroutine(self.Initialize());
+            else if (apbutton != null)
             {
+                apbutton.transform.DestroyAllChildren();
+                apbutton.Destroy();
+                apbutton = null;
+                APCanvas.transform.DestroyAllChildren();
+                APCanvas.Destroy();
+            }
+            /*{
                 GameObject modsbutton = GameObject.Find("Canvas/Safe Area/Menu/ButtonLayout/ModsButton");
                 apbutton = UnityEngine.Object.Instantiate<GameObject>(modsbutton, modsbutton.transform.position, Quaternion.identity, modsbutton.transform.parent);
                 apbutton.name = "APButton";
@@ -96,7 +107,7 @@ namespace Wildfrost_Archipelago.Managers
                         c.Destroy();
                     }
                 }
-            }
+            }*/
         }
 
         public static IEnumerator InitMenu()
@@ -105,7 +116,7 @@ namespace Wildfrost_Archipelago.Managers
             GameObject.Find("Canvas/Safe Area/Menu/ButtonLayout/ModsButton/Animator/Button").GetComponent<Button>().onClick.Invoke();
             yield return new WaitUntil(() => SceneManager.IsLoaded("Mods"));
             GameObject canvas = UnityEngine.SceneManagement.SceneManager.GetSceneByName("Mods").GetRootGameObjects().Single(obj => obj.GetComponent<WorldSpaceCanvasFitScreen>() != null);
-            GameObject APCanvas = canvas.InstantiateKeepName();
+            APCanvas = canvas.InstantiateKeepName();
             APCanvas.transform.SetParent(uiItems.transform);
             content = APCanvas.transform.FindRecursive("Content");
             content.DestroyAllChildren();
@@ -165,7 +176,13 @@ namespace Wildfrost_Archipelago.Managers
             password = passwordField.GetComponentInChildren<TMP_InputField>();
             passwordField.SetActive(true);
 
-            confirmButton.transform.SetAsLastSibling();
+            GameObject newConfirm = confirmButton.InstantiateKeepName();
+            newConfirm.transform.SetParent(content);
+            newConfirm.transform.SetAsLastSibling();
+            Button button = newConfirm.transform.Find("Animator/Button").GetComponent<Button>();
+            button.onClick.AddListener(delegate () {
+                TryConnect();
+            });
 
             renameSeq.transform.SetLocalX(7);
 
@@ -202,11 +219,7 @@ namespace Wildfrost_Archipelago.Managers
             UnityEngine.Object.DontDestroyOnLoad(confirmButton);
             Button button = confirmButton.transform.Find("Animator/Button").GetComponent<Button>();
             button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(delegate () {
-                TryConnect();
-            });
             text = button.gameObject.GetComponentInChildren<TextMeshProUGUI>().gameObject;
-            confirmButton.transform.SetParent(content);
 
             foreach (UnityEngine.Component c in text.GetComponents<UnityEngine.Component>())
             {
@@ -230,6 +243,19 @@ namespace Wildfrost_Archipelago.Managers
             ServiceFactory.sessionManager.StartSession(uriAndPort.text, playerSlot.text, password.text);
         }
 
+        public static void Unload()
+        {
+            uiItems.Destroy();
+            if (apbutton != null)
+            {
+                apbutton.transform.DestroyAllChildren();
+                apbutton.Destroy();
+                apbutton = null;
+                APCanvas.transform.DestroyAllChildren();
+                APCanvas.Destroy();
+            }
+        }
+
         [HarmonyPatch(typeof(ModifierDisplayCurrent), "OnEnable")]
         internal class PatchRenameButton
         {
@@ -249,6 +275,7 @@ namespace Wildfrost_Archipelago.Managers
         public static GameObject confirmButton = null;
         public static GameObject renameSeq = null;
         public static Transform scrollView = null;
+        public static GameObject APCanvas = null;
         public static Transform content = null;
         public static GameObject modPrefab = null;
         public static RectTransform buttonPrefab = null;

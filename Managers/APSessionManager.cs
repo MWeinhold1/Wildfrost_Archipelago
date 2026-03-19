@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using Wildfrost_Archipelago.Constants;
 using Wildfrost_Archipelago.Interfaces;
 
@@ -40,6 +41,9 @@ namespace Wildfrost_Archipelago.Archipelago
                     Logger.Log(LogType.Info, $"Successful connection to {uriAndPort}: Connected to slot ${success.Slot}");
                     //session.Items.ItemReceived += ItemReceived;
                     ServiceFactory.poolsManager.UpdatePools(GetAllReceivedItems());
+
+                    WildfrostArchipelago.SwitchToSaveProfile(uriAndPort+"_"+slotName);
+
                     return true;
                 }
             }
@@ -78,5 +82,32 @@ namespace Wildfrost_Archipelago.Archipelago
         {
             ServiceFactory.poolsManager.UpdatePools(GetAllReceivedItems());
         }*/
+
+        public void InterceptChallenge(ChallengeData chal)
+        {
+            Logger.Log(LogType.Info, "CHALLENGE DATA " + chal.name + " HAS BEEN INTERCEPTED");
+            //session.Locations.CompleteLocationChecks();
+            (GameObject.FindObjectOfType(typeof(MonoBehaviour)) as MonoBehaviour).StartCoroutine(UndoChallenge(chal));
+        }
+        public System.Collections.IEnumerator UndoChallenge(ChallengeData chal)
+        {
+            yield return new WaitForEndOfFrame();
+            Logger.Log(LogType.Info, "CHALLENGE DATA " + chal.name + " HAS BEEN WAITED FOR");
+            List<string> list = SaveSystem.LoadProgressData<List<string>>("completedChallenges", null) ?? new List<string>();
+            List<string> list2 = SaveSystem.LoadProgressData<List<string>>("townNew", null) ?? new List<string>();
+            List<string> list3 = SaveSystem.LoadProgressData<List<string>>("unlocked", null) ?? new List<string>();
+            foreach (string item in list3)
+                Logger.Log(LogType.Info, item);
+            list.Remove(chal.name);
+            list2.Remove(chal.reward.name);
+            list3.Remove(chal.reward.name);
+            MetaprogressionSystem.Set(chal.name, false);
+            SaveSystem.SaveProgressData<List<string>>("completedChallenges", list);
+            SaveSystem.SaveProgressData<List<string>>("townNew", list2);
+            SaveSystem.SaveProgressData<List<string>>("unlocked", list3);
+            foreach (string item in list3)
+                Logger.Log(LogType.Info, item);
+            yield break;
+        }
     }
 }
