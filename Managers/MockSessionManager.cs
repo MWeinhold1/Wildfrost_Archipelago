@@ -61,6 +61,7 @@ namespace Wildfrost_Archipelago.Archipelago
         public void InterceptChallenge(ChallengeData chal)
         {
             Logger.Log(LogType.Info, "CHALLENGE DATA " + chal.name + " HAS BEEN INTERCEPTED");
+            //SendLocationsFound(new int[] { APLocationConstants.GetLocationIDFromName(chal.name) });
             (GameObject.FindObjectOfType(typeof(MonoBehaviour)) as MonoBehaviour).StartCoroutine(UndoChallenge(chal));
         }
         public System.Collections.IEnumerator UndoChallenge(ChallengeData chal)

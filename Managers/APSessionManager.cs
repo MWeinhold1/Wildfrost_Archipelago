@@ -72,9 +72,9 @@ namespace Wildfrost_Archipelago.Archipelago
 
         public void ReceiveItemCallback() { throw new NotImplementedException(); }
 
-        public void SendLocationsFound(int[] locationIDs) { throw new NotImplementedException();
-            /*foreach (int ID in locationIDs)
-                session.Locations.GetLocationIdFromName("Wildfrost", APLocationConstants.LocationReferences[ID].localDescription);*/
+        public void SendLocationsFound(int[] locationIDs) {
+            foreach (int ID in locationIDs)
+                session.Locations.GetLocationIdFromName("Wildfrost", APLocationConstants.LocationReferences[ID].localDescription);
         }
 
         public void SendDeath() { throw new NotImplementedException(); }
@@ -86,7 +86,7 @@ namespace Wildfrost_Archipelago.Archipelago
         public void InterceptChallenge(ChallengeData chal)
         {
             Logger.Log(LogType.Info, "CHALLENGE DATA " + chal.name + " HAS BEEN INTERCEPTED");
-            //session.Locations.CompleteLocationChecks();
+            SendLocationsFound(new int[]{ APLocationConstants.GetLocationIDFromName(chal.name)});
             (GameObject.FindObjectOfType(typeof(MonoBehaviour)) as MonoBehaviour).StartCoroutine(UndoChallenge(chal));
         }
         public System.Collections.IEnumerator UndoChallenge(ChallengeData chal)
