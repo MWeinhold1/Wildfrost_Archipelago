@@ -31,6 +31,7 @@ namespace Wildfrost_Archipelago
                 sessionManager = new APSessionManager();
             poolsManager = new PoolsManager();
 
+            poolsManager.LoadSave();
             if (debug)
                 poolsManager.UpdatePools(sessionManager.GetAllReceivedItems());
 

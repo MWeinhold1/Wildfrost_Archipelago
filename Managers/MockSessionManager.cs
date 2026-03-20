@@ -29,12 +29,18 @@ namespace Wildfrost_Archipelago.Archipelago
         {
             Logger.Log(LogType.Info, "STARTING A MOCK SESSION WITH PARAMETERS: " + uriAndPort + " ; " + slotName + " ; " + password);
             WildfrostArchipelago.SwitchToSaveProfile(uriAndPort + "_" + slotName);
-            (GameObject.FindObjectOfType(typeof(MainMenu)) as MainMenu).skipTutorial = true;
+            SaveSystem.SaveProgressData<int>("tutorialProgress", 2);
             SaveSystem.SaveProgressData<bool>("tutorialTownDone", true);
             Events.OnChallengeCompletedSaved += InterceptChallenge;
 
             MetaprogressionSystem.Remove<string, string>("pets", "Wolfie", null);
             MetaprogressionSystem.Add<string, string>("pets", "Wolfie", "Pet 0");
+
+            foreach (ChallengeData chal in ChallengeSystem.GetAllChallenges())
+            {
+                chal.requires = new ChallengeData[] { };
+                chal.hidden = false;
+            }
 
             return true;
         }
@@ -62,22 +68,22 @@ namespace Wildfrost_Archipelago.Archipelago
         {
             Logger.Log(LogType.Info, "CHALLENGE DATA " + chal.name + " HAS BEEN INTERCEPTED");
             //SendLocationsFound(new int[] { APLocationConstants.GetLocationIDFromName(chal.name) });
-            (GameObject.FindObjectOfType(typeof(MonoBehaviour)) as MonoBehaviour).StartCoroutine(UndoChallenge(chal));
+            UndoChallenge(chal);
         }
         public System.Collections.IEnumerator UndoChallenge(ChallengeData chal)
         {
             yield return new WaitForEndOfFrame();
             Logger.Log(LogType.Info, "CHALLENGE DATA " + chal.name + " HAS BEEN WAITED FOR");
-            List<string> list = SaveSystem.LoadProgressData<List<string>>("completedChallenges", null) ?? new List<string>();
+            //List<string> list = SaveSystem.LoadProgressData<List<string>>("completedChallenges", null) ?? new List<string>();
             List<string> list2 = SaveSystem.LoadProgressData<List<string>>("townNew", null) ?? new List<string>();
             List<string> list3 = SaveSystem.LoadProgressData<List<string>>("unlocked", null) ?? new List<string>();
             foreach (string item in list3)
                 Logger.Log(LogType.Info, item);
-            list.Remove(chal.name);
+            //list.Remove(chal.name);
             list2.Remove(chal.reward.name);
             list3.Remove(chal.reward.name);
             MetaprogressionSystem.Set(chal.name, false);
-            SaveSystem.SaveProgressData<List<string>>("completedChallenges", list);
+            //SaveSystem.SaveProgressData<List<string>>("completedChallenges", list);
             SaveSystem.SaveProgressData<List<string>>("townNew", list2);
             SaveSystem.SaveProgressData<List<string>>("unlocked", list3);
             foreach (string item in list3)

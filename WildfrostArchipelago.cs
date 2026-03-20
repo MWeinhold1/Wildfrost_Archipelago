@@ -42,6 +42,8 @@ namespace Wildfrost_Archipelago
             ServiceFactory.eventManager.LoadEvents();
             InitUI();
             Events.OnSceneChanged += UIManager.OnSceneChanged;
+            Events.OnCampaignLoaded += ServiceFactory.poolsManager.LoadSave;
+            Application.quitting += Unload;
             base.Load();
             Logger.Log(LogType.Info, "Finished Loading Wildfrost Archipelago Mod");
         }
@@ -52,6 +54,7 @@ namespace Wildfrost_Archipelago
             if (oldProfile != null)
                 SwitchToSaveProfile(oldProfile);
             Events.OnSceneChanged -= UIManager.OnSceneChanged;
+            Events.OnCampaignLoaded -= ServiceFactory.poolsManager.LoadSave;
             UIManager.Unload();
             behaviour.Destroy();
             base.Unload();
@@ -100,11 +103,11 @@ namespace Wildfrost_Archipelago
             oldProfile = SaveSystem.GetProfile();
             SaveSystem.SetProfile(switchTo);
             SaveSystem.folderName = SaveSystem.profileFolder + "/" + switchTo;
-            SaveSystem.SaveProgressData<string[]>("lastSavedMods", lastMods);
             if (SaveSystem.Enabled)
             {
                 Events.InvokeSaveSystemProfileChanged();
             }
+            SaveSystem.SaveProgressData<string[]>("lastSavedMods", lastMods);
 
             //var loadFrom = SaveSystem.profileFolder + "/Default";
             //var dir = Directory.GetParent(SaveSystem.settings.FullPath);
