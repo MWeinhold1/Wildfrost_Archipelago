@@ -64,9 +64,11 @@ namespace Wildfrost_Archipelago.Archipelago
                     foreach (long id in session.Locations.AllLocationsChecked)
                     {
                         if (id.ToString()[0] == '5' || id.ToString()[0] == '6' || id.ToString()[0] == '7')
+                            //Don't do anything if its a repeatable ID since it won't align with anything anyway
                             continue;
                         APLocation loc = APLocationConstants.LocationReferences[(int)id];
                         if (loc.internalName == "")
+                            // Don't do anything if itsa nameless location (like the enemy kill locations)
                             continue;
                         ChallengeData chal = AddressableLoader.Get<ChallengeData>("ChallengeData", loc.internalName);
                         List<string> list = SaveSystem.LoadProgressData<List<string>>("completedChallenges", null) ?? new List<string>();
@@ -148,8 +150,8 @@ namespace Wildfrost_Archipelago.Archipelago
             //List<string> list = SaveSystem.LoadProgressData<List<string>>("completedChallenges", null) ?? new List<string>();
             List<string> list2 = SaveSystem.LoadProgressData<List<string>>("townNew", null) ?? new List<string>();
             List<string> list3 = SaveSystem.LoadProgressData<List<string>>("unlocked", null) ?? new List<string>();
-            foreach (string item in list3)
-                Logger.Log(LogType.Info, item);
+            //foreach (string item in list3)
+            //    Logger.Log(LogType.Info, item);
             //list.Remove(chal.name);
             list2.Remove(chal.reward.name);
             list3.Remove(chal.reward.name);
@@ -157,8 +159,8 @@ namespace Wildfrost_Archipelago.Archipelago
             //SaveSystem.SaveProgressData<List<string>>("completedChallenges", list);
             SaveSystem.SaveProgressData<List<string>>("townNew", list2);
             SaveSystem.SaveProgressData<List<string>>("unlocked", list3);
-            foreach (string item in list3)
-                Logger.Log(LogType.Info, item);
+            //foreach (string item in list3)
+            //    Logger.Log(LogType.Info, item);
             yield break;
         }
     }

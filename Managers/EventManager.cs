@@ -93,10 +93,10 @@ namespace Wildfrost_Archipelago.Managers
                     ManageItemNode(node);
                     break;
                 case CampaignNodeTypeShop shop:
-                    ManageShopNode(node);
+                    //ManageShopNode(node);
                     break;
                 case CampaignNodeTypeCharm charm:
-                    ManageCharmNode(node);
+                    //ManageCharmNode(node);
                     break;
                 case CampaignNodeTypeCompanion companion:
                     ManageCompanionNode(node);

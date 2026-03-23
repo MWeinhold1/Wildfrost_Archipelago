@@ -64,11 +64,20 @@ namespace Wildfrost_Archipelago.Managers
             {
                 if (!ProcessedItems.Contains(item))
                 {
+                    UnlockData unlock;
                     switch (item.type)
                     {
                         case APItemType.building:
+                            unlock = AddressableLoader.Get<UnlockData>("UnlockData", item.internalName);
+                            SaveUnlock(unlock);
                             break;
                         case APItemType.tribe:
+                            unlock = AddressableLoader.Get<UnlockData>("UnlockData", item.internalName);
+                            SaveUnlock(unlock);
+                            break;
+                        case APItemType.pet:
+                            unlock = AddressableLoader.Get<UnlockData>("UnlockData", item.internalName);
+                            SaveUnlock(unlock);
                             break;
                         case APItemType.bell:
                             break;
@@ -190,7 +199,7 @@ namespace Wildfrost_Archipelago.Managers
                 return CharmPool.TakeRandom();
             }
         }
-        public System.Collections.IEnumerable SavePools()
+        public System.Collections.IEnumerator SavePools()
         {
             yield return new WaitForEndOfFrame();
             if (Campaign.instance != null)
@@ -200,6 +209,18 @@ namespace Wildfrost_Archipelago.Managers
                 SaveSystem.SaveCampaignData<List<CardUpgradeData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "CharmPool", CharmPool);
             }
             yield break;
+        }
+        public System.Collections.IEnumerator SaveUnlock(UnlockData unlock)
+        {
+            yield return new WaitForEndOfFrame();
+            Logger.Log(LogType.Info, "UNLOCK DATA " + unlock.name + " HAS BEEN WAITED FOR");
+            List<string> list2 = SaveSystem.LoadProgressData<List<string>>("townNew", null) ?? new List<string>();
+            List<string> list3 = SaveSystem.LoadProgressData<List<string>>("unlocked", null) ?? new List<string>();
+            //list.Remove(chal.name);
+            list2.Add(unlock.name);
+            list3.Add(unlock.name);
+            SaveSystem.SaveProgressData<List<string>>("townNew", list2);
+            SaveSystem.SaveProgressData<List<string>>("unlocked", list3);
         }
     }
 }

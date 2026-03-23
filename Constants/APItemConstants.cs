@@ -28,6 +28,7 @@ namespace Wildfrost_Archipelago.Constants
         building = 10,
         tribe = 20,
         pet = 30,
+        map_event = 40,
         common_item = 50,
         snow_item = 51,
         shade_item = 52,
@@ -58,6 +59,8 @@ namespace Wildfrost_Archipelago.Constants
                     return APItemConstants.Tribes[id];
                 case "30":
                     return APItemConstants.Pets[id];
+                case "40":
+                    return APItemConstants.MapEvents[id];
                 case "50":
                     return APItemConstants.CommonItems[id];
                 case "51":
@@ -94,11 +97,11 @@ namespace Wildfrost_Archipelago.Constants
 
         public static Dictionary<long, APItem> Buildings = new Dictionary<long, APItem>
         {
-            {10000, new APItem(10000, 10, "pet_house", "Pet House")},
-            {10001, new APItem(10001, 10, "inventor_hut", "Inventor Hut")},
-            {10002, new APItem(10002, 10, "icebreaker_cabin", "Icebreaker Cabin")},
-            {10003, new APItem(10003, 10, "hot_spring", "Hot Spring")},
-            {10004, new APItem(10004, 10, "frostoscope", "Frostoscope")},
+            {10000, new APItem(10000, 10, "PetHutFinished", "Pet House")},
+            {10001, new APItem(10001, 10, "InventorHutFinished", "Inventor Hut")},
+            {10002, new APItem(10002, 10, "IcebreakerHutFinished", "Icebreaker Cabin")},
+            {10003, new APItem(10003, 10, "HotSpringFinished", "Hot Spring")},
+            {10004, new APItem(10004, 10, "FrostoscopeFinished", "Frostoscope")},
             //{10005, new APItem(10005, 10, "tribe_hall", "Tribe Hall")},
         };
 
@@ -111,13 +114,20 @@ namespace Wildfrost_Archipelago.Constants
 
         public static Dictionary<long, APItem> Pets = new Dictionary<long, APItem>
         {
-            {30000, new APItem(30000, 30, "Wolfie", "Snoof")},
-            {30001, new APItem(30001, 30, "BerryPet", "Booshu")},
-            {30002, new APItem(30002, 30, "DemonPet", "Loki")},
-            {30003, new APItem(30003, 30, "DrawPet", "Sneezle")},
-            {30004, new APItem(30004, 30, "Jagzag", "Spike")},
-            {30005, new APItem(30005, 30, "InkPet", "Binku")},
-            {30006, new APItem(30006, 30, "BoostPet", "Lil' Gazi")},
+            {30000, new APItem(30000, 30, "Pet 0", "Snoof")},
+            {30001, new APItem(30001, 30, "Pet 1", "Booshu")},
+            {30002, new APItem(30002, 30, "Pet 2", "Loki")},
+            {30003, new APItem(30003, 30, "Pet 3", "Sneezle")},
+            {30004, new APItem(30004, 30, "Pet 4", "Spike")},
+            {30005, new APItem(30005, 30, "Pet 4a", "Binku")},
+            {30006, new APItem(30006, 30, "Pet 5", "Lil' Gazi")},
+        };
+
+        public static Dictionary<long, APItem> MapEvents = new Dictionary<long, APItem>
+        {
+            {40000, new APItem(40000, 30, "Event 1", "Shade Sculptor")},
+            {40001, new APItem(40001, 30, "Event 2", "Charm Merchant")},
+            {40002, new APItem(40002, 30, "Event 3", "Gnome Merchant")},
         };
 
         public static Dictionary<long, APItem> CommonItems = new Dictionary<long, APItem>
