@@ -107,9 +107,9 @@ namespace Wildfrost_Archipelago.Constants
 
         public static Dictionary<long, APItem> Tribes = new Dictionary<long, APItem>
         {
-            {20000, new APItem(20000, 20, "Basic", "Snowdwellers")},
-            {20001, new APItem(20001, 20, "Magic", "Shademancers")},
-            {20002, new APItem(20002, 20, "Clunk", "Clunkmasters")},
+            {20000, new APItem(20000, 20, "Tribe 0", "Snowdwellers")},
+            {20001, new APItem(20001, 20, "Tribe 1", "Shademancers")},
+            {20002, new APItem(20002, 20, "Tribe 2", "Clunkmasters")},
         };
 
         public static Dictionary<long, APItem> Pets = new Dictionary<long, APItem>

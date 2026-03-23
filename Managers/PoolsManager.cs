@@ -204,15 +204,16 @@ namespace Wildfrost_Archipelago.Managers
             yield return new WaitForEndOfFrame();
             if (Campaign.instance != null)
             {
+                Logger.Log(LogType.Info, "SAVING POOLS");
                 SaveSystem.SaveCampaignData<List<CardData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "ItemPool", ItemPool);
                 SaveSystem.SaveCampaignData<List<CardData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "UnitPool", UnitPool);
                 SaveSystem.SaveCampaignData<List<CardUpgradeData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "CharmPool", CharmPool);
             }
             yield break;
         }
-        public System.Collections.IEnumerator SaveUnlock(UnlockData unlock)
+        public void SaveUnlock(UnlockData unlock)
         {
-            yield return new WaitForEndOfFrame();
+            //yield return new WaitForEndOfFrame();
             Logger.Log(LogType.Info, "UNLOCK DATA " + unlock.name + " HAS BEEN WAITED FOR");
             List<string> list2 = SaveSystem.LoadProgressData<List<string>>("townNew", null) ?? new List<string>();
             List<string> list3 = SaveSystem.LoadProgressData<List<string>>("unlocked", null) ?? new List<string>();
@@ -221,6 +222,7 @@ namespace Wildfrost_Archipelago.Managers
             list3.Add(unlock.name);
             SaveSystem.SaveProgressData<List<string>>("townNew", list2);
             SaveSystem.SaveProgressData<List<string>>("unlocked", list3);
+            //yield break;
         }
     }
 }
