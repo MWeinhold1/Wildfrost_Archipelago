@@ -48,7 +48,7 @@ namespace Wildfrost_Archipelago.Archipelago
         public List<APItem> GetAllReceivedItems() {
             List<APItem> list = new List<APItem>();
             foreach (long item in ReceivedItemIDs)
-                list = list.Append(APItemConstants.GetItem(item)).ToList();
+                list.Add(APItemConstants.GetItem(item));
             return list;
         }
 
@@ -89,6 +89,11 @@ namespace Wildfrost_Archipelago.Archipelago
             foreach (string item in list3)
                 Logger.Log(LogType.Info, item);
             yield break;
+        }
+
+        public List<int> GetRepeatableLocations(char type, char tribe)
+        {
+            throw new NotImplementedException();
         }
 
         private static readonly Dictionary<string, object> MockOptions = new Dictionary<string, object>

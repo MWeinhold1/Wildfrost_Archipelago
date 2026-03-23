@@ -24,6 +24,6 @@ namespace Wildfrost_Archipelago.Interfaces
         void SendLocationsFound(int[] locationIDs);
 
         void SendDeath();
-
+        List<int> GetRepeatableLocations(char type, char tribe);
     }
 }

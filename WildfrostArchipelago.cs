@@ -17,7 +17,7 @@ namespace Wildfrost_Archipelago
     public class WildfrostArchipelago : WildfrostMod
     {
         public static WildfrostArchipelago modRef;
-        public static bool debugMode = true;
+        public static bool debugMode = false;
         public GameObject behaviour;
         public static string oldProfile;
         public WildfrostArchipelago(string modDirectory) : base(modDirectory)

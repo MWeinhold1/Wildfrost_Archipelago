@@ -14,58 +14,89 @@ namespace Wildfrost_Archipelago.Managers
 {
     public class PoolsManager
     {
-        List<APItem> AllItems = new List<APItem>();
+        List<APItem> ProcessedItems = new List<APItem>(); // Name can be misleading - this is for all items
+        List<APItem> AllItems = new List<APItem>(); // Name can be misleading - this is for units, items, charms. Not buildings and bells and stuff
         List<CardData> ItemPool = new List<CardData>();
         List<CardData> UnitPool = new List<CardData>();
         List<CardUpgradeData> CharmPool = new List<CardUpgradeData>();
-        char curTribe { 
+        List<APItem> ItemsToAddOnLoad = new List<APItem>();
+        public char curTribe { 
             get {
                 switch (References.PlayerData.classData.name)
                 {
-                    case "Snow":
+                    case "Basic":
                         return '1';
                     case "Magic":
                         return '2';
                     case "Clunk":
                         return '3';
                     default:
-                        return '4';
+                        return '0';
                 }
             }
         }
         public void LoadSave()
         {
-            List<int> list = SaveSystem.LoadProgressData<List<int>>("APItems") ?? new List<int> { };
-            if (list.Count > 0)
+            List<int> list = SaveSystem.LoadProgressData<List<int>>("ProcessedItems") ?? new List<int> { };
+            foreach (int id in list)
             {
-                foreach (int id in list)
-                {
-                    APItem item = APItemConstants.GetItem(id);
-                    if (!AllItems.Contains(item))
-                        AllItems = AllItems.Append(item).ToList();
-                }
-            }    
+                ProcessedItems.Add(APItemConstants.GetItem(id));
+            }
+            List<int> list2 = SaveSystem.LoadProgressData<List<int>>("AllItems") ?? new List<int> { };
+            foreach (int id in list2)
+            {
+                AllItems.Add(APItemConstants.GetItem(id));
+            }
             if (Campaign.instance != null)
             {
+                Logger.Log(LogType.Info, "trying to load pools");
                 ItemPool = SaveSystem.LoadCampaignData<List<CardData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "ItemPool");
                 UnitPool = SaveSystem.LoadCampaignData<List<CardData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "UnitPool");
                 CharmPool = SaveSystem.LoadCampaignData<List<CardUpgradeData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "CharmPool");
+                foreach (APItem item in ItemsToAddOnLoad)
+                    AddToTribe(item);
             }
+            UpdatePools(ServiceFactory.sessionManager.GetAllReceivedItems());
         }
         public void UpdatePools(List<APItem> list)
         {
             foreach (APItem item in list)
             {
-                if (!AllItems.Contains(item))
+                if (!ProcessedItems.Contains(item))
                 {
-                    AllItems = AllItems.Append(item).ToList();
-                    AddToTribe(item);
+                    switch (item.type)
+                    {
+                        case APItemType.building:
+                            break;
+                        case APItemType.tribe:
+                            break;
+                        case APItemType.bell:
+                            break;
+                        case APItemType.trap_boon:
+                            break;
+                        default:
+                            AllItems.Add(item);
+                            if (Campaign.instance != null)
+                                AddToTribe(item);
+                            else
+                                ItemsToAddOnLoad.Add(item);
+                            break;
+                    }
+                    ProcessedItems.Add(item);
                 }
             }
-            List<int> list2 = new List<int> { };
+            List<int> list2 = new List<int>() { };
+            foreach (APItem item in ProcessedItems) {
+                list2.Add(item.APID);
+            }
+            SaveSystem.SaveProgressData<List<int>>("ProcessedItems", list2);
+
+            List<int> list3 = new List<int>() { };
             foreach (APItem item in AllItems)
-                list2 = list2.Append(item.APID).ToList();
-            SaveSystem.SaveProgressData<List<int>>("APItems", list2);
+            {
+                list3.Add(item.APID);
+            }
+            SaveSystem.SaveProgressData<List<int>>("AllItems", list3);
             SavePools();
         }
         public void AddToTribe(APItem item)
@@ -97,13 +128,13 @@ namespace Wildfrost_Archipelago.Managers
             switch (item.APID.ToString()[0])
             {
                 case '5':
-                    ItemPool = ItemPool.Append(AddressableLoader.Get<CardData>(typeof(CardData).Name, item.internalName)).ToList();
+                    ItemPool.Add(AddressableLoader.Get<CardData>(typeof(CardData).Name, item.internalName));
                     break;
                 case '6':
-                    UnitPool = UnitPool.Append(AddressableLoader.Get<CardData>(typeof(CardData).Name, item.internalName)).ToList();
+                    UnitPool.Add(AddressableLoader.Get<CardData>(typeof(CardData).Name, item.internalName));
                     break;
                 case '7':
-                    CharmPool = CharmPool.Append(AddressableLoader.Get<CardUpgradeData>(typeof(CardUpgradeData).Name, item.internalName)).ToList();
+                    CharmPool.Add(AddressableLoader.Get<CardUpgradeData>(typeof(CardUpgradeData).Name, item.internalName));
                     break;
             }
         }

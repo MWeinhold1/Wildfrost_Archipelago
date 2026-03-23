@@ -1,5 +1,7 @@
 ﻿using Deadpan.Enums.Engine.Components.Modding;
 using FMODUnity;
+using HarmonyLib;
+using Rewired.ComponentControls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,6 +41,45 @@ namespace Wildfrost_Archipelago.Managers
                 card.name == AssetManager.fullUnitName)
             {
                 Logger.Log(LogType.Info, "Modifying an Archifact card");
+                CampaignNode node = Campaign.FindCharacterNode(References.Player);
+                if (node != null)
+                {
+                    int[] checks;
+                    string[] cards;
+                    switch (node.type)
+                    {
+                        case CampaignNodeTypeItem item:
+                            checks = node.data.Get<SaveCollection<int>>("checks").collection;
+                            cards = node.data.Get<SaveCollection<string>>("cards").collection;
+                            foreach (int check in checks)
+                            {
+                                if (check != -1 && cards.Contains(card.name))
+                                {
+                                    card.flavour = checks[cards.ToList().IndexOf(card.name)].ToString();
+                                }
+                            }
+                            break;
+                        case CampaignNodeTypeShop shop:
+                            break;
+                        case CampaignNodeTypeCompanion companion:
+                            checks = node.data.Get<SaveCollection<int>>("checks").collection;
+                            cards = node.data.Get<SaveCollection<string>>("cards").collection;
+                            foreach (int check in checks)
+                            {
+                                if (check != -1 && cards.Contains(card.name))
+                                {
+                                    card.flavour = checks[cards.ToList().IndexOf(card.name)].ToString();
+                                }
+                            }
+                            break;
+                        case CampaignNodeTypeCharmShop charmShop:
+                            break;
+                        case CampaignNodeTypeCurseItems gnome:
+                            break;
+                        default:
+                            break;
+                    }
+                }
                 card.forceTitle = "AP Item Name";
                 card.attackEffects.First().data.textInsert = "Send <Sample Text> to <Other Player>";
             }
@@ -84,40 +125,9 @@ namespace Wildfrost_Archipelago.Managers
             // Works for cards, not charms
             Logger.Log(LogType.Info, $"Entity Entered Backpack: {card.data?.name ?? "Not a card"}");
             ClassData tribe = References.PlayerData.classData;
-            if (card.name == AssetManager.fullUnitName)
-            {
-                int[] locations = new int[1];
-                switch (tribe.name)
-                {
-                    case "Basic":
-                        locations[0] = 60000;
-                        break;
-                    case "Magic":
-                        locations[0] = 61000;
-                        break;
-                    case "Clunk":
-                        locations[0] = 62000;
-                        break;
-                }
-                ServiceFactory.sessionManager.SendLocationsFound(locations);
-            }
-            else if (card.name == AssetManager.fullItemName)
-            {
-                int[] locations = new int[1];
-                switch (tribe.name)
-                {
-                    case "Basic":
-                        locations[0] = 50000;
-                        break;
-                    case "Magic":
-                        locations[0] = 51000;
-                        break;
-                    case "Clunk":
-                        locations[0] = 52000;
-                        break;
-                }
-                ServiceFactory.sessionManager.SendLocationsFound(locations);
-            }
+            int[] locations = new int[1];
+            locations[0] = Convert.ToInt32(card.data.flavour);
+            ServiceFactory.sessionManager.SendLocationsFound(locations);
             References.PlayerData.inventory.deck.Remove(card.data);
         }
 
@@ -133,18 +143,28 @@ namespace Wildfrost_Archipelago.Managers
                 return;
             string name = AssetManager.fullItemName;
             Random rand = new Random();
+            List<int> possibleChecks = ServiceFactory.sessionManager.GetRepeatableLocations('5', ServiceFactory.poolsManager.curTribe);
+            int[] checksAdded = { -1, -1, -1 };
+            SaveCollection<int> checksCollection = new SaveCollection<int>();
             SaveCollection<string> saveCollection = node.campaignNode.data.Get<SaveCollection<string>>("cards");
             foreach (int num3 in saveCollection.collection.GetIndices<string>().InRandomOrder<int>())
             {
                 CardData item = ServiceFactory.poolsManager.PullItem();
-                if (rand.Next(0, 100) >= 50 || item == null)
+                if ((rand.Next(0, 100) >= 50 || item == null) && possibleChecks.Count() > 0)
+                {
                     saveCollection[num3] = name;
-                else
+                    checksAdded[num3] = possibleChecks.TakeRandom();
+                }
+                else if (item != null)
                     saveCollection[num3] = item.name;
+                else
+                    saveCollection[num3] = name;
 
                 if (node.campaignNode.data.ContainsKey(string.Format("upgrades{0}", num3)))
                     node.campaignNode.data.Remove(string.Format("upgrades{0}", num3));
             }
+            checksCollection.collection = checksAdded;
+            node.campaignNode.data.Add("checks", checksCollection);
             node.campaignNode.data.Add("AP_mod", true);
         }
 
@@ -177,18 +197,28 @@ namespace Wildfrost_Archipelago.Managers
                 return;
             string name = AssetManager.fullUnitName;
             Random rand = new Random();
+            List<int> possibleChecks = ServiceFactory.sessionManager.GetRepeatableLocations('6', ServiceFactory.poolsManager.curTribe);
+            int[] checksAdded = { -1, -1, -1 };
+            SaveCollection<int> checksCollection = new SaveCollection<int>();
             SaveCollection<string> saveCollection = node.campaignNode.data.Get<SaveCollection<string>>("cards");
             foreach (int num3 in saveCollection.collection.GetIndices<string>().InRandomOrder<int>())
             {
                 CardData unit = ServiceFactory.poolsManager.PullUnit();
-                if (rand.Next(0, 100) >= 50 || unit == null)
+                if ((rand.Next(0, 100) >= 50 || unit == null) && possibleChecks.Count() > 0)
+                {
                     saveCollection[num3] = name;
-                else
+                    checksAdded[num3] = possibleChecks.TakeRandom();
+                }
+                else if (unit != null)
                     saveCollection[num3] = unit.name;
+                else
+                    saveCollection[num3] = name;
 
                 if (node.campaignNode.data.ContainsKey(string.Format("upgrades{0}", num3)))
                     node.campaignNode.data.Remove(string.Format("upgrades{0}", num3));
             }
+            checksCollection.collection = checksAdded;
+            node.campaignNode.data.Add("checks", checksCollection);
             node.campaignNode.data.Add("AP_mod", true);
         }
 
@@ -196,13 +226,19 @@ namespace Wildfrost_Archipelago.Managers
         {
             if (node.campaignNode.data.ContainsKey("AP_mod"))
                 return;
+            List<int> possibleChecks = ServiceFactory.sessionManager.GetRepeatableLocations('7', ServiceFactory.poolsManager.curTribe);
             string name = AssetManager.fullCharmName;
             Random rand = new Random();
             CardUpgradeData charm = ServiceFactory.poolsManager.PullCharm();
-            if (rand.Next(0, 100) >= 50 || charm == null)
+            if ((rand.Next(0, 100) >= 50 || charm == null) && possibleChecks.Count() > 0)
+            {
                 node.campaignNode.data["charm"] = name;
-            else
+                node.campaignNode.data["check"] = possibleChecks.TakeRandom();
+            }
+            else if (charm != null)
                 node.campaignNode.data["charm"] = charm.name;
+            else
+                node.campaignNode.data["charm"] = name;
             node.campaignNode.data.Add("AP_mod", true);
         }
 

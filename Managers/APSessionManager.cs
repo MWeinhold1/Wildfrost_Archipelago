@@ -2,8 +2,11 @@
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
+using HarmonyLib;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,7 +29,7 @@ namespace Wildfrost_Archipelago.Archipelago
             try
             {
                 session = ArchipelagoSessionFactory.CreateSession(uriAndPort);
-                result = session.TryConnectAndLogin(gameName, slotName, ItemsHandlingFlags.AllItems, password: password);
+                result = session.TryConnectAndLogin(gameName, slotName, ItemsHandlingFlags.AllItems, password: password, version: new Version(0, 6, 6));
                 if (!result.Successful)
                 {
                     session = null;
@@ -39,10 +42,41 @@ namespace Wildfrost_Archipelago.Archipelago
                 {
                     LoginSuccessful success = (LoginSuccessful)result;
                     Logger.Log(LogType.Info, $"Successful connection to {uriAndPort}: Connected to slot ${success.Slot}");
-                    //session.Items.ItemReceived += ItemReceived;
-                    ServiceFactory.poolsManager.UpdatePools(GetAllReceivedItems());
+                    session.Items.ItemReceived += ItemReceived;
+                    ServiceFactory.poolsManager.LoadSave();
 
                     WildfrostArchipelago.SwitchToSaveProfile(uriAndPort+"_"+slotName);
+
+                    SaveSystem.SaveProgressData<int>("tutorialProgress", 2);
+                    SaveSystem.SaveProgressData<bool>("tutorialTownDone", true);
+                    Events.OnChallengeCompletedSaved += InterceptChallenge;
+
+                    MetaprogressionSystem.Remove<string, string>("pets", "Wolfie", null);
+                    MetaprogressionSystem.Add<string, string>("pets", "Wolfie", "Pet 0");
+
+                    foreach (ChallengeData chal in ChallengeSystem.GetAllChallenges())
+                    {
+                        chal.requires = new ChallengeData[] { };
+                        chal.hidden = false;
+                    }
+
+                    // AUTO-COMPLETING ALREADY COMPLETED LOCATIONS IN CASE OF GAME COMPLETIONS OR NEW CLIENT SAVES
+                    foreach (long id in session.Locations.AllLocationsChecked)
+                    {
+                        if (id.ToString()[0] == '5' || id.ToString()[0] == '6' || id.ToString()[0] == '7')
+                            continue;
+                        APLocation loc = APLocationConstants.LocationReferences[(int)id];
+                        if (loc.internalName == "")
+                            continue;
+                        ChallengeData chal = AddressableLoader.Get<ChallengeData>("ChallengeData", loc.internalName);
+                        List<string> list = SaveSystem.LoadProgressData<List<string>>("completedChallenges", null) ?? new List<string>();
+                        if (!list.Contains(chal.name))
+                        {
+                            list.Add(chal.name);
+                            MetaprogressionSystem.Set(chal.name, true);
+                            SaveSystem.SaveProgressData<List<string>>("completedChallenges", list);
+                        }
+                    }
 
                     return true;
                 }
@@ -60,7 +94,7 @@ namespace Wildfrost_Archipelago.Archipelago
         public List<APItem> GetAllReceivedItems() {
             List<APItem> list = new List<APItem>();
             foreach (ItemInfo item in session.Items.AllItemsReceived.ToArray())
-                list.Append(APItemConstants.GetItem(item.ItemId));
+                list.Add(APItemConstants.GetItem(item.ItemId));
             return list;
         }
 
@@ -72,17 +106,35 @@ namespace Wildfrost_Archipelago.Archipelago
 
         public void ReceiveItemCallback() { throw new NotImplementedException(); }
 
-        public void SendLocationsFound(int[] locationIDs) {
+        public void SendLocationsFound(int[] locationIDs)
+        {
             foreach (int ID in locationIDs)
-                session.Locations.GetLocationIdFromName("Wildfrost", APLocationConstants.LocationReferences[ID].localDescription);
+            {
+                //session.Locations.GetLocationIdFromName("Wildfrost", APLocationConstants.LocationReferences[ID].localDescription);
+                Logger.Log(LogType.Info, "Sending location " + ID.ToString());
+                session.Locations.CompleteLocationChecksAsync((long)ID);
+            }
         }
 
         public void SendDeath() { throw new NotImplementedException(); }
-        /*private void ItemReceived(ReceivedItemsHelper.ItemReceivedHandler helper)
+        private void ItemReceived(ReceivedItemsHelper helper)
         {
             ServiceFactory.poolsManager.UpdatePools(GetAllReceivedItems());
-        }*/
-
+        }
+        
+        public List<int> GetRepeatableLocations(char type, char tribe)
+        {
+            int[] list = { };
+            foreach (long longID in session.Locations.AllMissingLocations)
+            {
+                int ID = (int)longID;
+                if (ID.ToString()[0] == type && ID.ToString()[1] == tribe)
+                {
+                    list = list.AddItem(ID).ToArray();
+                }
+            }
+            return list.ToList();
+        }
         public void InterceptChallenge(ChallengeData chal)
         {
             Logger.Log(LogType.Info, "CHALLENGE DATA " + chal.name + " HAS BEEN INTERCEPTED");
@@ -93,16 +145,16 @@ namespace Wildfrost_Archipelago.Archipelago
         {
             yield return new WaitForEndOfFrame();
             Logger.Log(LogType.Info, "CHALLENGE DATA " + chal.name + " HAS BEEN WAITED FOR");
-            List<string> list = SaveSystem.LoadProgressData<List<string>>("completedChallenges", null) ?? new List<string>();
+            //List<string> list = SaveSystem.LoadProgressData<List<string>>("completedChallenges", null) ?? new List<string>();
             List<string> list2 = SaveSystem.LoadProgressData<List<string>>("townNew", null) ?? new List<string>();
             List<string> list3 = SaveSystem.LoadProgressData<List<string>>("unlocked", null) ?? new List<string>();
             foreach (string item in list3)
                 Logger.Log(LogType.Info, item);
-            list.Remove(chal.name);
+            //list.Remove(chal.name);
             list2.Remove(chal.reward.name);
             list3.Remove(chal.reward.name);
             MetaprogressionSystem.Set(chal.name, false);
-            SaveSystem.SaveProgressData<List<string>>("completedChallenges", list);
+            //SaveSystem.SaveProgressData<List<string>>("completedChallenges", list);
             SaveSystem.SaveProgressData<List<string>>("townNew", list2);
             SaveSystem.SaveProgressData<List<string>>("unlocked", list3);
             foreach (string item in list3)
