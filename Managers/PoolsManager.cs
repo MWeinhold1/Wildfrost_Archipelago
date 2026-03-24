@@ -20,6 +20,7 @@ namespace Wildfrost_Archipelago.Managers
         List<CardData> UnitPool = new List<CardData>();
         List<CardUpgradeData> CharmPool = new List<CardUpgradeData>();
         List<APItem> ItemsToAddOnLoad = new List<APItem>();
+        List<string> UnlocksToSave = new List<string>();
         public char curTribe { 
             get {
                 switch (References.PlayerData.classData.name)
@@ -50,9 +51,9 @@ namespace Wildfrost_Archipelago.Managers
             if (Campaign.instance != null)
             {
                 Logger.Log(LogType.Info, "trying to load pools");
-                ItemPool = SaveSystem.LoadCampaignData<List<CardData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "ItemPool");
-                UnitPool = SaveSystem.LoadCampaignData<List<CardData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "UnitPool");
-                CharmPool = SaveSystem.LoadCampaignData<List<CardUpgradeData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "CharmPool");
+                ItemPool = SaveSystem.LoadCampaignData<List<CardData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "ItemPool") ?? new List<CardData>();
+                UnitPool = SaveSystem.LoadCampaignData<List<CardData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "UnitPool") ?? new List<CardData>();
+                CharmPool = SaveSystem.LoadCampaignData<List<CardUpgradeData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "CharmPool") ?? new List<CardUpgradeData>();
                 foreach (APItem item in ItemsToAddOnLoad)
                     AddToTribe(item);
             }
@@ -69,15 +70,15 @@ namespace Wildfrost_Archipelago.Managers
                     {
                         case APItemType.building:
                             unlock = AddressableLoader.Get<UnlockData>("UnlockData", item.internalName);
-                            SaveUnlock(unlock);
+                            UnlocksToSave.Add(unlock.name);
                             break;
                         case APItemType.tribe:
                             unlock = AddressableLoader.Get<UnlockData>("UnlockData", item.internalName);
-                            SaveUnlock(unlock);
+                            UnlocksToSave.Add(unlock.name);
                             break;
                         case APItemType.pet:
                             unlock = AddressableLoader.Get<UnlockData>("UnlockData", item.internalName);
-                            SaveUnlock(unlock);
+                            UnlocksToSave.Add(unlock.name);
                             break;
                         case APItemType.bell:
                             break;
@@ -94,6 +95,8 @@ namespace Wildfrost_Archipelago.Managers
                     ProcessedItems.Add(item);
                 }
             }
+            if (UnlocksToSave.Count > 0)
+                SaveUnlock();
             List<int> list2 = new List<int>() { };
             foreach (APItem item in ProcessedItems) {
                 list2.Add(item.APID);
@@ -106,31 +109,14 @@ namespace Wildfrost_Archipelago.Managers
                 list3.Add(item.APID);
             }
             SaveSystem.SaveProgressData<List<int>>("AllItems", list3);
-            SavePools();
         }
         public void AddToTribe(APItem item)
         {
             char tribeID = item.APID.ToString()[1];
-            if (References.PlayerData == null || tribeID != curTribe)
+            if (References.PlayerData == null)
                 return;
-            switch (tribeID)
-            {
-                case '0':
-                    AddToPool(item);
-                    break;
-                case '1':
-                    if (References.PlayerData.classData.name == "Snow")
-                        AddToPool(item);
-                    break;
-                case '2':
-                    if (References.PlayerData.classData.name == "Magic")
-                        AddToPool(item);
-                    break;
-                case '3':
-                    if (References.PlayerData.classData.name == "Clunk")
-                        AddToPool(item);
-                    break;
-            }
+            if (tribeID == curTribe || tribeID == '0')
+                AddToPool(item);
         }
         public void AddToPool(APItem item)
         {
@@ -149,20 +135,17 @@ namespace Wildfrost_Archipelago.Managers
         }
         public void PopulatePools()
         {
-            SavePools();
             foreach (APItem item in AllItems)
                 AddToTribe(item);
         }
         public void PopulatePool(char type)
         {
-            SavePools();
             foreach (APItem item in AllItems)
                 if (item.APID.ToString()[0] == type)
                     AddToTribe(item);
         }
         public CardData PullItem()
         {
-            SavePools();
             if (ItemPool.Count > 0)
                 return ItemPool.TakeRandom();
             else
@@ -175,7 +158,6 @@ namespace Wildfrost_Archipelago.Managers
         }
         public CardData PullUnit()
         {
-            SavePools();
             if (UnitPool.Count > 0)
                 return UnitPool.TakeRandom();
             else
@@ -188,7 +170,6 @@ namespace Wildfrost_Archipelago.Managers
         }
         public CardUpgradeData PullCharm()
         {
-            SavePools();
             if (CharmPool.Count > 0)
                 return CharmPool.TakeRandom();
             else
@@ -199,30 +180,28 @@ namespace Wildfrost_Archipelago.Managers
                 return CharmPool.TakeRandom();
             }
         }
-        public System.Collections.IEnumerator SavePools()
+        public async void SavePools()
         {
-            yield return new WaitForEndOfFrame();
             if (Campaign.instance != null)
             {
+                await Task.Delay(16);
                 Logger.Log(LogType.Info, "SAVING POOLS");
                 SaveSystem.SaveCampaignData<List<CardData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "ItemPool", ItemPool);
                 SaveSystem.SaveCampaignData<List<CardData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "UnitPool", UnitPool);
                 SaveSystem.SaveCampaignData<List<CardUpgradeData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "CharmPool", CharmPool);
             }
-            yield break;
         }
-        public void SaveUnlock(UnlockData unlock)
+        public async void SaveUnlock()
         {
-            //yield return new WaitForEndOfFrame();
-            Logger.Log(LogType.Info, "UNLOCK DATA " + unlock.name + " HAS BEEN WAITED FOR");
+            await Task.Delay(16);
             List<string> list2 = SaveSystem.LoadProgressData<List<string>>("townNew", null) ?? new List<string>();
             List<string> list3 = SaveSystem.LoadProgressData<List<string>>("unlocked", null) ?? new List<string>();
-            //list.Remove(chal.name);
-            list2.Add(unlock.name);
-            list3.Add(unlock.name);
+            UnlocksToSave = UnlocksToSave.Where(name => !list3.Contains(name)).ToList();
+            list2.AddRange(UnlocksToSave);
+            list3.AddRange(UnlocksToSave);
+            UnlocksToSave.Clear();
             SaveSystem.SaveProgressData<List<string>>("townNew", list2);
             SaveSystem.SaveProgressData<List<string>>("unlocked", list3);
-            //yield break;
         }
     }
 }

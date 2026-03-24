@@ -42,6 +42,7 @@ namespace Wildfrost_Archipelago
             ServiceFactory.eventManager.LoadEvents();
             InitUI();
             Events.OnSceneChanged += UIManager.OnSceneChanged;
+            Events.OnCampaignSaved += ServiceFactory.poolsManager.SavePools;
             Events.OnCampaignLoaded += ServiceFactory.poolsManager.LoadSave;
             Application.quitting += Unload;
             base.Load();
@@ -54,6 +55,7 @@ namespace Wildfrost_Archipelago
             if (oldProfile != null)
                 SwitchToSaveProfile(oldProfile);
             Events.OnSceneChanged -= UIManager.OnSceneChanged;
+            Events.OnCampaignSaved -= ServiceFactory.poolsManager.SavePools;
             Events.OnCampaignLoaded -= ServiceFactory.poolsManager.LoadSave;
             UIManager.Unload();
             behaviour.Destroy();

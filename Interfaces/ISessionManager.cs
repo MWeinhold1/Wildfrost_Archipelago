@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Archipelago.MultiClient.Net.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,5 +26,6 @@ namespace Wildfrost_Archipelago.Interfaces
 
         void SendDeath();
         List<int> GetRepeatableLocations(char type, char tribe);
+        Task<Dictionary<long, ScoutedItemInfo>> GetLocationData(int ID);
     }
 }

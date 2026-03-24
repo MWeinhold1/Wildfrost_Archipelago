@@ -189,7 +189,7 @@ namespace Wildfrost_Archipelago.Constants
             {52000, new APItem(52000, 52, "BoltHarpoon", "Azul Battle Axe")},
             {52001, new APItem(52001, 52, "FlashWhip", "Azul Candle")},
             {52002, new APItem(52002, 52, "ZapOrb", "Azul Skull")},
-            {52003, new APItem(52003, 52, "BeepopMask", "Beepop Mask")},
+            {52003, new APItem(52003, 52, "BeepopMask", "Beepop Mask")},    
             {52004, new APItem(52004, 52, "Plum", "Berry Bell")},
             {52005, new APItem(52005, 52, "Dittostone", "Blank Mask")},
             {52006, new APItem(52006, 52, "Shwooper", "Blizzard Bottle")},
@@ -430,7 +430,22 @@ namespace Wildfrost_Archipelago.Constants
         };
         public static Dictionary<long, APItem> TrapBoon = new Dictionary<long, APItem>
         {
-        
+            {90000, new APItem(90000, 90, "", "25 Bling")},
+            {90001, new APItem(90001, 90, "", "Berry Basket Boon")},
+            {90002, new APItem(90002, 90, "", "Spicy Boon")},
+            {90003, new APItem(90003, 90, "", "Snowy Boon")},
+            {90004, new APItem(90004, 90, "", "Speed Boon")},
+            {90005, new APItem(90005, 90, "", "Bling Bling Boon")},
+            {90006, new APItem(90006, 90, "", "Sun Smite Boon")},
+            {90007, new APItem(90007, 90, "", "Bombard Trap")},
+            {90008, new APItem(90008, 90, "", "Hoghead Trap")},
+            {90009, new APItem(90009, 90, "", "Gunk Bomb Trap")},
+            {90010, new APItem(90010, 90, "", "Ice Wall Trap")},
+            {90011, new APItem(90011, 90, "", "Ink Blot Trap")},
+            {90012, new APItem(90012, 90, "", "Goofy Gobbler Trap")},
+            {90013, new APItem(90013, 90, "", "Minion Death Trap")},
+            {90014, new APItem(90014, 90, "", "Throwing Shade Trap")},
+            {90015, new APItem(90015, 90, "", "Cursed Crown Trap")},
         };
     }
 }

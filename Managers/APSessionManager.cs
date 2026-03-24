@@ -20,6 +20,7 @@ namespace Wildfrost_Archipelago.Archipelago
     {
         private const string gameName = "Wildfrost";
         private ArchipelagoSession session;
+        private List<string> RewardsToUndo = new List<string>(){};
 
         public bool StartSession(string uriAndPort, string slotName, string password)
         {
@@ -121,7 +122,8 @@ namespace Wildfrost_Archipelago.Archipelago
         public void SendDeath() { throw new NotImplementedException(); }
         private void ItemReceived(ReceivedItemsHelper helper)
         {
-            ServiceFactory.poolsManager.UpdatePools(GetAllReceivedItems());
+            ItemInfo item = helper.DequeueItem();
+            ServiceFactory.poolsManager.UpdatePools(new List<APItem>() { APItemConstants.GetItem(item.ItemId)});
         }
         
         public List<int> GetRepeatableLocations(char type, char tribe)
@@ -137,31 +139,32 @@ namespace Wildfrost_Archipelago.Archipelago
             }
             return list.ToList();
         }
+        private bool awaitingUndo = false;
         public void InterceptChallenge(ChallengeData chal)
         {
             Logger.Log(LogType.Info, "CHALLENGE DATA " + chal.name + " HAS BEEN INTERCEPTED");
             SendLocationsFound(new int[]{ APLocationConstants.GetLocationIDFromName(chal.name)});
-            (GameObject.FindObjectOfType(typeof(MonoBehaviour)) as MonoBehaviour).StartCoroutine(UndoChallenge(chal));
+            RewardsToUndo.Add(chal.reward.name);
+            if (!awaitingUndo)
+                UndoChallenge();
         }
-        public System.Collections.IEnumerator UndoChallenge(ChallengeData chal)
+        public async void UndoChallenge()
         {
-            yield return new WaitForEndOfFrame();
-            Logger.Log(LogType.Info, "CHALLENGE DATA " + chal.name + " HAS BEEN WAITED FOR");
-            //List<string> list = SaveSystem.LoadProgressData<List<string>>("completedChallenges", null) ?? new List<string>();
+            awaitingUndo = true;
+            await Task.Delay(16);
             List<string> list2 = SaveSystem.LoadProgressData<List<string>>("townNew", null) ?? new List<string>();
             List<string> list3 = SaveSystem.LoadProgressData<List<string>>("unlocked", null) ?? new List<string>();
-            //foreach (string item in list3)
-            //    Logger.Log(LogType.Info, item);
-            //list.Remove(chal.name);
-            list2.Remove(chal.reward.name);
-            list3.Remove(chal.reward.name);
-            MetaprogressionSystem.Set(chal.name, false);
-            //SaveSystem.SaveProgressData<List<string>>("completedChallenges", list);
+            foreach (string name in RewardsToUndo) { 
+                list2.Remove(name);
+                list3.Remove(name);
+            }
             SaveSystem.SaveProgressData<List<string>>("townNew", list2);
             SaveSystem.SaveProgressData<List<string>>("unlocked", list3);
-            //foreach (string item in list3)
-            //    Logger.Log(LogType.Info, item);
-            yield break;
+            awaitingUndo = false;
+        }
+        public async Task<Dictionary<long, ScoutedItemInfo>> GetLocationData(int ID)
+        {
+            return await session.Locations.ScoutLocationsAsync((long)ID);
         }
     }
 }

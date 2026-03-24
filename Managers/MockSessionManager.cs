@@ -96,6 +96,11 @@ namespace Wildfrost_Archipelago.Archipelago
             throw new NotImplementedException();
         }
 
+        public Task<Dictionary<long, ScoutedItemInfo>> GetLocationData(int ID)
+        {
+            throw new NotImplementedException();
+        }
+
         private static readonly Dictionary<string, object> MockOptions = new Dictionary<string, object>
         {
             {"goal", 0},
