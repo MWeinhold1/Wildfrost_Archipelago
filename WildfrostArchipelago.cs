@@ -72,7 +72,7 @@ namespace Wildfrost_Archipelago
             Logger.Log(LogType.Info, "Loading Mod Assets");
 
             var assetManager = ServiceFactory.assetManager;
-            assets.Add(assetManager.GetStatusEffectBuilder());
+            //assets.Add(assetManager.GetStatusEffectBuilder());
             assets.Add(assetManager.GetUnitBuilder());
             assets.Add(assetManager.GetItemBuilder());
             assets.Add(assetManager.GetCharmBuilder());

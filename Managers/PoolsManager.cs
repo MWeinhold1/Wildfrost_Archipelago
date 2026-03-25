@@ -41,19 +41,27 @@ namespace Wildfrost_Archipelago.Managers
             List<int> list = SaveSystem.LoadProgressData<List<int>>("ProcessedItems") ?? new List<int> { };
             foreach (int id in list)
             {
-                ProcessedItems.Add(APItemConstants.GetItem(id));
+                if (!ProcessedItems.Contains(APItemConstants.GetItem(id)))
+                    ProcessedItems.Add(APItemConstants.GetItem(id));
             }
             List<int> list2 = SaveSystem.LoadProgressData<List<int>>("AllItems") ?? new List<int> { };
             foreach (int id in list2)
             {
-                AllItems.Add(APItemConstants.GetItem(id));
+                if (!AllItems.Contains(APItemConstants.GetItem(id)))
+                    AllItems.Add(APItemConstants.GetItem(id));
             }
             if (Campaign.instance != null)
             {
                 Logger.Log(LogType.Info, "trying to load pools");
-                ItemPool = SaveSystem.LoadCampaignData<List<CardData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "ItemPool") ?? new List<CardData>();
-                UnitPool = SaveSystem.LoadCampaignData<List<CardData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "UnitPool") ?? new List<CardData>();
-                CharmPool = SaveSystem.LoadCampaignData<List<CardUpgradeData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "CharmPool") ?? new List<CardUpgradeData>();
+                List<int> ItemIDs = SaveSystem.LoadCampaignData<List<int>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "ItemPool") ?? new List<int>();
+                foreach (int id in ItemIDs)
+                    AddToPool(AllItems.Single(item => item.APID == id));
+                List<int> UnitIDs = SaveSystem.LoadCampaignData<List<int>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "UnitPool") ?? new List<int>();
+                foreach (int id in UnitIDs)
+                    AddToPool(AllItems.Single(item => item.APID == id));
+                List<int> CharmIDs = SaveSystem.LoadCampaignData<List<int>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "CharmPool") ?? new List<int>();
+                foreach (int id in CharmIDs)
+                    AddToPool(AllItems.Single(item => item.APID == id));
                 foreach (APItem item in ItemsToAddOnLoad)
                     AddToTribe(item);
             }
@@ -85,6 +93,8 @@ namespace Wildfrost_Archipelago.Managers
                         case APItemType.trap_boon:
                             break;
                         default:
+                            if (AllItems.Contains(item))
+                                break;
                             AllItems.Add(item);
                             if (Campaign.instance != null)
                                 AddToTribe(item);
@@ -123,13 +133,13 @@ namespace Wildfrost_Archipelago.Managers
             switch (item.APID.ToString()[0])
             {
                 case '5':
-                    ItemPool.Add(AddressableLoader.Get<CardData>(typeof(CardData).Name, item.internalName));
+                    ItemPool.Add(AddressableLoader.Get<CardData>("CardData", item.internalName));
                     break;
                 case '6':
-                    UnitPool.Add(AddressableLoader.Get<CardData>(typeof(CardData).Name, item.internalName));
+                    UnitPool.Add(AddressableLoader.Get<CardData>("CardData", item.internalName));
                     break;
                 case '7':
-                    CharmPool.Add(AddressableLoader.Get<CardUpgradeData>(typeof(CardUpgradeData).Name, item.internalName));
+                    CharmPool.Add(AddressableLoader.Get<CardUpgradeData>("CardUpgradeData", item.internalName));
                     break;
             }
         }
@@ -186,9 +196,18 @@ namespace Wildfrost_Archipelago.Managers
             {
                 await Task.Delay(16);
                 Logger.Log(LogType.Info, "SAVING POOLS");
-                SaveSystem.SaveCampaignData<List<CardData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "ItemPool", ItemPool);
-                SaveSystem.SaveCampaignData<List<CardData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "UnitPool", UnitPool);
-                SaveSystem.SaveCampaignData<List<CardUpgradeData>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "CharmPool", CharmPool);
+                List<int> ItemIDs = new List<int>();
+                foreach (CardData card in ItemPool)
+                    ItemIDs.Add(AllItems.Single(item => item.internalName == card.name).APID);
+                List<int> UnitIDs = new List<int>();
+                foreach (CardData card in UnitPool)
+                    UnitIDs.Add(AllItems.Single(item => item.internalName == card.name).APID);
+                List<int> CharmIDs = new List<int>();
+                foreach (CardUpgradeData charm in CharmPool)
+                    CharmIDs.Add(AllItems.Single(item => item.internalName == charm.name).APID);
+                SaveSystem.SaveCampaignData<List<int>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "ItemPool", ItemIDs);
+                SaveSystem.SaveCampaignData<List<int>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "UnitPool", UnitIDs);
+                SaveSystem.SaveCampaignData<List<int>>(AddressableLoader.Get<GameMode>("GameMode", "GameModeNormal"), "CharmPool", CharmIDs);
             }
         }
         public async void SaveUnlock()

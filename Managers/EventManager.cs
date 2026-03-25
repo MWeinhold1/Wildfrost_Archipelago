@@ -11,8 +11,11 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using UnityEngine.Localization;
 using UnityEngine.Localization.SmartFormat.Utilities;
+using UnityEngine.Localization.Tables;
 using static ES3;
+using static Mono.Security.X509.X520;
 
 namespace Wildfrost_Archipelago.Managers
 {
@@ -23,10 +26,10 @@ namespace Wildfrost_Archipelago.Managers
             Logger.Log(LogType.Info, "Loading Events");
             Events.OnCampaignStart += Events_OnCampaignStart;
             Events.OnMapNodeSelect += Events_OnMapNodeSelect;
-            //Events.OnCardDataCreated += Events_OnCardDataCreated;
+            Events.OnCardDataCreated += Events_OnCardDataCreated;
             Events.OnEntityEnterBackpack += Events_OnEntityEnterBackpack;
             Events.OnUpgradeGained += Events_OnUpgradeGained;
-            //Events.OnEventPopulated += Events_OnEventPopulated;
+            Events.OnEventPopulated += Events_OnEventPopulated;
         }
 
         public void UnloadEvents()
@@ -34,142 +37,87 @@ namespace Wildfrost_Archipelago.Managers
             Logger.Log(LogType.Info, "Unloading Events");
             Events.OnCampaignStart -= Events_OnCampaignStart;
             Events.OnMapNodeSelect -= Events_OnMapNodeSelect;
-            //Events.OnCardDataCreated -= Events_OnCardDataCreated;
+            Events.OnCardDataCreated -= Events_OnCardDataCreated;
             Events.OnEntityEnterBackpack -= Events_OnEntityEnterBackpack;
             Events.OnUpgradeGained -= Events_OnUpgradeGained;
-            //Events.OnEventPopulated -= Events_OnEventPopulated;
+            Events.OnEventPopulated -= Events_OnEventPopulated;
         }
 
-        public void Events_OnEventPopulated(EventRoutine routine)
+        public async void Events_OnEventPopulated(EventRoutine routine)
         {
-            int[] checks;
-            string[] cards;
+            await Task.Delay(64);
+            CreateCheckNames(routine);
+        }
+        private async void CreateCheckNames(EventRoutine routine)
+        {
+            if (!routine.node.data.ContainsKey("checks") || !routine.node.data.ContainsKey("entitiesToChange"))
+                return;
+            int[] checks = routine.node.data.Get<SaveCollection<int>>("checks").collection;
             int i = 0;
-            Logger.Log(LogType.Info, routine.GetType().Name);
-            switch (routine.GetType().Name)
+            foreach (CardData card in routine.node.data.Get<List<CardData>>("entitiesToChange"))
             {
-                case "ShopRoutine":
-                    checks = routine.node.data.Get<SaveCollection<int>>("checks").collection;
-                    ShopRoutine.Data data = routine.node.data.Get<ShopRoutine.Data>("shopData");
-                    foreach (Entity entity in (routine as ShopRoutine).entities)
+                while (checks[i] == -1)
+                    i++;
+                Card cardInstance = null;
+                CardContainer[] containers = routine.GetComponentsInChildren<CardContainer>(true);
+                foreach (CardContainer container in containers)
+                {
+                    if (container.Group.Any(entity => entity.data == card))
                     {
-                        if (checks[i] != -1)
-                            UpdateCheckInfo(entity, checks[i]);
-                        i++;
+                        UpdateCheckInfo((container.Group.Where(entity => entity.data == card).ToList().First().display as Card), checks[i]);
+                        await Task.Delay(16);
+                        break;
                     }
-                    break;
-                case "EventRoutineCharmShop":
-                    checks = routine.node.data.Get<SaveCollection<int>>("checks").collection;
-                    EventRoutineCharmShop.Data data2 = routine.data.Get<EventRoutineCharmShop.Data>("data");
-                    foreach (Entity entity in (routine as EventRoutineCharmShop).cardContainer.entities)
-                    {
-                        if (checks[i] != -1)
-                            UpdateCheckInfo(entity, checks[i]);
-                        i++;
-                    }
-                    break;
-                case "EventRoutineCompanion":
-                    checks = routine.node.data.Get<SaveCollection<int>>("checks").collection;
-                    cards = routine.node.data.Get<SaveCollection<string>>("cards").collection;
-                    foreach (Entity entity in (routine as EventRoutineCompanion).cardContainer.entities)
-                    {
-                        if (checks[i] != -1)
-                            UpdateCheckInfo(entity, checks[i]);
-                        i++;
-                    }
-                    break;
-                case "ItemEventRoutine":
-                    checks = routine.node.data.Get<SaveCollection<int>>("checks").collection;
-                    cards = routine.node.data.Get<SaveCollection<string>>("cards").collection;
-                    foreach (Entity entity in (routine as ItemEventRoutine).cardContainer.entities)
-                    {
-                        if (checks[i] != -1)
-                            UpdateCheckInfo(entity, checks[i]);
-                        i++;
-                    }
-                    break;
-                case "EventRoutineGnomeShop":
-                    checks = routine.node.data.Get<SaveCollection<int>>("checks").collection;
-                    cards = routine.node.data.Get<SaveCollection<string>>("cards").collection;
-                    foreach (Entity entity in (routine as EventRoutineGnomeShop).cardContainer.entities)
-                    {
-                        if (checks[i] != -1)
-                            UpdateCheckInfo(entity, checks[i]);
-                        i++;
-                    }
-                    break;
-                default:
-                    break;
+                    else
+                        Logger.Log(LogType.Warning, "No card found!");
+                }
+                i++;
             }
         }
-        public async void UpdateCheckInfo(Entity entity, int check)
+        public async void UpdateCheckInfo(Card cardInstance, int check)
         {
-            CardData card = entity.data;
-            ScoutedItemInfo info = (await ServiceFactory.sessionManager.GetLocationData(check))[(long)check];
+            CardData card = cardInstance.entity.data;
+            card.flavour = check.ToString();
+            Dictionary<long, ScoutedItemInfo> dict = (await ServiceFactory.sessionManager.GetLocationData(check));
+            ScoutedItemInfo info = dict.First().Value;
             card.forceTitle = info.LocationDisplayName;
-            card.attackEffects.First().data = card.attackEffects.First().data.InstantiateKeepName();
-            card.attackEffects.First().data.textInsert = "Send " + info.ItemDisplayName + " to " + info.Player;
+            Logger.Log(LogType.Info, info.LocationDisplayName);
+            Logger.Log(LogType.Info, info.ItemDisplayName);
+            StringTable collection = LocalizationHelper.GetCollection("Cards", new LocaleIdentifier(UnityEngine.SystemLanguage.English));
+            collection.SetString("AP_desc_" + card.flavour.ToString() , "Send " + info.ItemDisplayName + " to " + info.Player);
+            card.textKey = collection.GetString("AP_desc_" + card.flavour.ToString());
+            cardInstance.Reset();
+            cardInstance.entity.ClearStatuses();
+            //await Task.Delay(1000);
+            //cardInstance.StartCoroutine(cardInstance.UpdateData());
+            cardInstance.SetName();
+            cardInstance.SetDescription();
         }
 
-        /*private async void Events_OnCardDataCreated(CardData card)
+        private void Events_OnCardDataCreated(CardData card)
         {
             if (card.name == AssetManager.fullItemName ||
                 card.name == AssetManager.fullUnitName)
             {
-                Logger.Log(LogType.Info, "Modifying an Archifact card");
+                //Logger.Log(LogType.Info, "Modifying an Archifact card");
                 CampaignNode node = Campaign.FindCharacterNode(References.Player);
                 if (node != null)
                 {
-                    int[] checks;
-                    string[] cards;
-                    switch (node.type)
+                    List<CardData> list = new List<CardData>();
+                    if (node.data.ContainsKey("entitiesToChange"))
                     {
-                        case CampaignNodeTypeShop shop:
-                            checks = node.data.Get<SaveCollection<int>>("checks").collection;
-                            ShopRoutine.Data data = node.data.Get<ShopRoutine.Data>("shopData");
-                            foreach (int check in checks)
-                            {
-                                int i = checks.ToList().IndexOf(check);
-                                if (check != -1 && data.items[i].cardDataName == card.name)
-                                {
-                                    card.flavour = check.ToString();
-                                    data.items[i] = null;
-                                    break;
-                                }
-                            }
-                            break;
-                        case CampaignNodeTypeCharmShop charmShop:
-                            checks = node.data.Get<SaveCollection<int>>("checks").collection;
-                            cards = new string[]{node.data.Get<EventRoutineCharmShop.Data>("data").cards[0].cardDataName};
-                            if (checks[0] != -1)
-                            {
-                                card.flavour = checks[0].ToString();
-                            }
-                            break;
-                        default:
-                            checks = node.data.Get<SaveCollection<int>>("checks").collection;
-                            cards = node.data.Get<SaveCollection<string>>("cards").collection;
-                            foreach (int check in checks)
-                            {
-                                int i = checks.ToList().IndexOf(check);
-                                if (check != -1 && cards[i] == card.name)
-                                {
-                                    card.flavour = check.ToString();
-                                    cards[i] = null;
-                                    break;
-                                }
-                            }
-                            break;
+                        list = node.data.Get<List<CardData>>("entitiesToChange");
+                        list.Add(card);
+                        node.data["entitiesToChange"] = list;
                     }
-                    if (card.flavour == null || (card.flavour[0] != '6' && card.flavour[0] != '5'))
-                        return;
-                    ScoutedItemInfo info = (await ServiceFactory.sessionManager.GetLocationData(Convert.ToInt32(card.flavour)))[Convert.ToInt64(card.flavour)];
-                    card.forceTitle = info.LocationDisplayName;
-                    card.attackEffects.First().data = card.attackEffects.First().data.InstantiateKeepName(); 
-                    card.attackEffects.First().data.textInsert = "Send " + info.ItemDisplayName + " to " + info.Player;
+                    else
+                    {
+                        list.Add(card);
+                        node.data.Add("entitiesToChange", list);
+                    }
                 }
             }
-        } */
+        }
 
         private void Events_OnMapNodeSelect(MapNode node)
         {
@@ -223,7 +171,7 @@ namespace Wildfrost_Archipelago.Managers
                             break;
                         case CampaignNodeTypeShop shop:
                             checks = node.data.Get<SaveCollection<int>>("checks").collection;
-                            ShopRoutine.Data data = node.data.Get<ShopRoutine.Data>("data");
+                            ShopRoutine.Data data = node.data.Get<ShopRoutine.Data>("shopData");
                             foreach (string charmName in data.charms)
                             {
                                 int i = data.charms.IndexOf(charmName);
@@ -259,10 +207,17 @@ namespace Wildfrost_Archipelago.Managers
         {
             // Works for cards, not charms
             Logger.Log(LogType.Info, $"Entity Entered Backpack: {card.data?.name ?? "Not a card"}");
-            int[] locations = new int[1];
-            locations[0] = Convert.ToInt32(card.data.flavour);
-            ServiceFactory.sessionManager.SendLocationsFound(locations);
-            References.PlayerData.inventory.deck.Remove(card.data);
+            if (card.data.name == AssetManager.fullItemName ||
+                card.data.name == AssetManager.fullUnitName)
+            {
+                if (card.data.flavour != "")
+                {
+                    int[] locations = new int[1];
+                    locations[0] = Convert.ToInt32(card.data.flavour);
+                    ServiceFactory.sessionManager.SendLocationsFound(locations);
+                }
+                References.PlayerData.inventory.deck.Remove(card.data);
+            }
         }
 
         private void Events_OnCampaignStart()
@@ -314,7 +269,7 @@ namespace Wildfrost_Archipelago.Managers
 
             int[] checksAdded = { -1, -1, -1, -1, -1, -1, -1 };
             SaveCollection<int> checksCollection = new SaveCollection<int>();
-            ShopRoutine.Data data = node.campaignNode.data.Get<ShopRoutine.Data>("data");
+            ShopRoutine.Data data = node.campaignNode.data.Get<ShopRoutine.Data>("shopData");
 
             foreach (ShopRoutine.Item card in data.items)
             {
@@ -330,21 +285,23 @@ namespace Wildfrost_Archipelago.Managers
                 else
                     card.cardDataName = itemName;
             }
-
+            Dictionary<int, string> charmsToChange = new Dictionary<int, string>(){ };
             foreach (string charmItem in data.charms)
             {
                 int i = data.charms.IndexOf(charmItem);
                 CardUpgradeData charm = ServiceFactory.poolsManager.PullCharm();
                 if ((rand.Next(0, 100) >= 50 || charm == null) && possibleCharmChecks.Count() > 0)
                 {
-                    data.charms[i] = charmName;
+                    charmsToChange.Add(i, charmName);
                     checksAdded[4 + i] = possibleCardChecks.TakeRandom();
                 }
                 else if (charm != null)
-                    data.charms[i] = charm.name;
+                    charmsToChange.Add(i, charm.name);
                 else
-                    data.charms[i] = charmName;
+                    charmsToChange.Add(i, charmName);
             }
+            foreach (KeyValuePair<int, string> pair in charmsToChange)
+                data.charms[pair.Key] = pair.Value;
             checksCollection.collection = checksAdded;
             node.campaignNode.data.Add("checks", checksCollection);
             node.campaignNode.data.Add("AP_mod", true);

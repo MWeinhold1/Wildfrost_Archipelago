@@ -43,44 +43,7 @@ namespace Wildfrost_Archipelago.Archipelago
                 {
                     LoginSuccessful success = (LoginSuccessful)result;
                     Logger.Log(LogType.Info, $"Successful connection to {uriAndPort}: Connected to slot ${success.Slot}");
-                    session.Items.ItemReceived += ItemReceived;
-                    ServiceFactory.poolsManager.LoadSave();
-
-                    WildfrostArchipelago.SwitchToSaveProfile(uriAndPort+"_"+slotName);
-
-                    SaveSystem.SaveProgressData<int>("tutorialProgress", 2);
-                    SaveSystem.SaveProgressData<bool>("tutorialTownDone", true);
-                    Events.OnChallengeCompletedSaved += InterceptChallenge;
-
-                    MetaprogressionSystem.Remove<string, string>("pets", "Wolfie", null);
-                    MetaprogressionSystem.Add<string, string>("pets", "Wolfie", "Pet 0");
-
-                    foreach (ChallengeData chal in ChallengeSystem.GetAllChallenges())
-                    {
-                        chal.requires = new ChallengeData[] { };
-                        chal.hidden = false;
-                    }
-
-                    // AUTO-COMPLETING ALREADY COMPLETED LOCATIONS IN CASE OF GAME COMPLETIONS OR NEW CLIENT SAVES
-                    foreach (long id in session.Locations.AllLocationsChecked)
-                    {
-                        if (id.ToString()[0] == '5' || id.ToString()[0] == '6' || id.ToString()[0] == '7')
-                            //Don't do anything if its a repeatable ID since it won't align with anything anyway
-                            continue;
-                        APLocation loc = APLocationConstants.LocationReferences[(int)id];
-                        if (loc.internalName == "")
-                            // Don't do anything if itsa nameless location (like the enemy kill locations)
-                            continue;
-                        ChallengeData chal = AddressableLoader.Get<ChallengeData>("ChallengeData", loc.internalName);
-                        List<string> list = SaveSystem.LoadProgressData<List<string>>("completedChallenges", null) ?? new List<string>();
-                        if (!list.Contains(chal.name))
-                        {
-                            list.Add(chal.name);
-                            MetaprogressionSystem.Set(chal.name, true);
-                            SaveSystem.SaveProgressData<List<string>>("completedChallenges", list);
-                        }
-                    }
-
+                    InitializeSession(uriAndPort, slotName);
                     return true;
                 }
             }
@@ -90,6 +53,54 @@ namespace Wildfrost_Archipelago.Archipelago
                 Logger.Log(LogType.Error, e.ToString());
                 return false;
             }
+        }
+
+        public async void InitializeSession(string uriAndPort, string slotName)
+        {
+            session.Items.ItemReceived += ItemReceived;
+            ServiceFactory.poolsManager.LoadSave();
+
+            await Task.Delay(16);
+            WildfrostArchipelago.SwitchToSaveProfile(uriAndPort + "_" + slotName);
+            await Task.Delay(16);
+
+            SaveSystem.SaveProgressData<int>("tutorialProgress", 2);
+            SaveSystem.SaveProgressData<bool>("tutorialTownDone", true);
+            Events.OnChallengeCompletedSaved += InterceptChallenge;
+
+            MetaprogressionSystem.Remove<string, string>("pets", "Wolfie", null);
+            MetaprogressionSystem.Add<string, string>("pets", "Wolfie", "Pet 0");
+
+            foreach (ChallengeData chal in ChallengeSystem.GetAllChallenges())
+            {
+                chal.requires = new ChallengeData[] { };
+                chal.hidden = false;
+            }
+
+            await Task.Delay(16);
+            // AUTO-COMPLETING ALREADY COMPLETED LOCATIONS IN CASE OF GAME COMPLETIONS OR NEW CLIENT SAVES
+            List<string> list = SaveSystem.LoadProgressData<List<string>>("completedChallenges", null) ?? new List<string>();
+            await Task.Delay(16);
+            foreach (long id in session.Locations.AllLocationsChecked)
+            {
+                if (id.ToString()[0] == '5' || id.ToString()[0] == '6' || id.ToString()[0] == '7')
+                    //Don't do anything if its a repeatable ID since it won't align with anything anyway
+                    continue;
+                APLocation loc = APLocationConstants.LocationReferences[(int)id];
+                if (loc.internalName == "")
+                    // Don't do anything if itsa nameless location (like the enemy kill locations)
+                    continue;
+                ChallengeData chal = AddressableLoader.Get<ChallengeData>("ChallengeData", loc.internalName);
+                if (!list.Contains(chal.name))
+                {
+                    list.Add(chal.name);
+                    MetaprogressionSystem.Set(chal.name, true);
+                    SaveSystem.SaveProgressData<List<string>>("completedChallenges", list);
+                }
+            }
+            Logger.Log(LogType.Info, $"Successful connection to {uriAndPort}");
+
+
         }
 
         public string GetLocationName(int APID) => session.Locations.GetLocationNameFromId(APID);
