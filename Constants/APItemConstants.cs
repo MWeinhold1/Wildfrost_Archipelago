@@ -76,7 +76,7 @@ namespace Wildfrost_Archipelago.Constants
                 case "62":
                     return APItemConstants.ShadeUnits[id];
                 case "63":
-                    return APItemConstants.ClunkItems[id];
+                    return APItemConstants.ClunkUnits[id];
                 case "70":
                     return APItemConstants.CommonCharm[id];
                 case "71":

@@ -58,7 +58,7 @@ namespace Wildfrost_Archipelago.Archipelago
         public async void InitializeSession(string uriAndPort, string slotName)
         {
             session.Items.ItemReceived += ItemReceived;
-            ServiceFactory.poolsManager.LoadSave();
+            ServiceFactory.poolsManager.UpdatePools(GetAllReceivedItems());
 
             await Task.Delay(16);
             WildfrostArchipelago.SwitchToSaveProfile(uriAndPort + "_" + slotName);
@@ -83,13 +83,10 @@ namespace Wildfrost_Archipelago.Archipelago
             await Task.Delay(16);
             foreach (long id in session.Locations.AllLocationsChecked)
             {
-                if (id.ToString()[0] == '5' || id.ToString()[0] == '6' || id.ToString()[0] == '7')
-                    //Don't do anything if its a repeatable ID since it won't align with anything anyway
+                if (id.ToString()[0] == '3' || id.ToString()[0] == '4' || id.ToString()[0] == '5' || id.ToString()[0] == '6' || id.ToString()[0] == '7')
+                    //Don't do anything if its a kill location or a repeatable ID since it won't align with anything anyway
                     continue;
                 APLocation loc = APLocationConstants.LocationReferences[(int)id];
-                if (loc.internalName == "")
-                    // Don't do anything if itsa nameless location (like the enemy kill locations)
-                    continue;
                 ChallengeData chal = AddressableLoader.Get<ChallengeData>("ChallengeData", loc.internalName);
                 if (!list.Contains(chal.name))
                 {
@@ -134,6 +131,7 @@ namespace Wildfrost_Archipelago.Archipelago
         private void ItemReceived(ReceivedItemsHelper helper)
         {
             ItemInfo item = helper.DequeueItem();
+            Logger.Log(LogType.Info, "Receiving item of id " + item.ItemId.ToString());
             ServiceFactory.poolsManager.UpdatePools(new List<APItem>() { APItemConstants.GetItem(item.ItemId)});
         }
         
@@ -143,7 +141,7 @@ namespace Wildfrost_Archipelago.Archipelago
             foreach (long longID in session.Locations.AllMissingLocations)
             {
                 int ID = (int)longID;
-                if (ID.ToString()[0] == type && ID.ToString()[1] == tribe)
+                if (ID.ToString()[0] == type && (ID.ToString()[1] == tribe || ID.ToString()[0] == '8'))
                 {
                     list = list.AddItem(ID).ToArray();
                 }
@@ -169,6 +167,7 @@ namespace Wildfrost_Archipelago.Archipelago
                 list2.Remove(name);
                 list3.Remove(name);
             }
+            RewardsToUndo.Clear();
             SaveSystem.SaveProgressData<List<string>>("townNew", list2);
             SaveSystem.SaveProgressData<List<string>>("unlocked", list3);
             awaitingUndo = false;
