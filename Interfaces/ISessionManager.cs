@@ -26,6 +26,8 @@ namespace Wildfrost_Archipelago.Interfaces
 
         void SendDeath();
         List<int> GetRepeatableLocations(char type, char tribe);
+
+        void SetGoalAchieved();
         Task<Dictionary<long, ScoutedItemInfo>> GetLocationData(int ID);
     }
 }

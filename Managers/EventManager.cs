@@ -62,7 +62,7 @@ namespace Wildfrost_Archipelago.Managers
             int i = 0;
             foreach (CardData card in routine.node.data.Get<List<CardData>>("entitiesToChange"))
             {
-                while (checks[i] == -1 && i < checks.Length)
+                while (checks[i] == -1 && i < checks.Length && i < 4)
                     i++;
                 Card cardInstance = null;
                 CardContainer[] containers = routine.GetComponentsInChildren<CardContainer>(true);
@@ -128,6 +128,8 @@ namespace Wildfrost_Archipelago.Managers
 
         private void Events_OnMapNodeSelect(MapNode node)
         {
+            if (node == null || node.campaignNode == null)
+                return;
             switch (node.campaignNode.type)
             {
                 case CampaignNodeTypeItem item:
@@ -158,68 +160,12 @@ namespace Wildfrost_Archipelago.Managers
         {
             // Works for charms
             Logger.Log(LogType.Info, $"Charm Found: {charm.title} : {charm.name}");
-            int[] locations = new int[1];
             if (charm.name == AssetManager.fullCharmName)
             {
-                CampaignNode node = Campaign.FindCharacterNode(References.Player);
-                if (node != null)
-                {
-                    int[] checks;
-                    List<string> charms = new List<string>();
-                    switch (node.type)
-                    {
-                        case CampaignNodeTypeCharm charmNode:
-                            int check = node.data.Get<int>("check");
-                            if (check != -1)
-                            {
-                                locations[0] = check;
-                                break;
-                            }
-                            break;
-                        case CampaignNodeTypeShop shop:
-                            checks = node.data.Get<SaveCollection<int>>("checks").collection;
-                            ShopRoutine.Data data = node.data.Get<ShopRoutine.Data>("shopData");
-                            foreach (string charmName in data.charms)
-                            {
-                                int i = data.charms.IndexOf(charmName);
-                                if (checks[4 + i] != -1 && charm.name == charmName)
-                                {
-                                    locations[0] = checks[4+i];
-                                    //checks[4 + i] = -1;
-                                    break;
-                                }
-                            }
-                            break;
-                        case CampaignNodeTypeCharmShop charmShop:
-                            checks = node.data.Get<SaveCollection<int>>("checks").collection;
-                            foreach (EventRoutineCharmShop.CharmShopItemData item in node.data.Get<EventRoutineCharmShop.Data>("data").items)
-                            {
-                                int i = node.data.Get<EventRoutineCharmShop.Data>("data").items.IndexOf(item);
-                                if (checks[1 + i] != -1 && charm.name == item.upgradeDataName)
-                                {
-                                    locations[0] = checks[1+i];
-                                    //checks[1 + i] = -1;
-                                    break;
-                                }
-                            }
-                            break;
-                        case CampaignNodeTypeBoss boss:
-                            checks = node.data.Get<SaveCollection<int>>("checks").collection;
-                            foreach (BossRewardData.Data _data in node.data.Get<List<BossRewardData.Data>>("rewards"))
-                            {
-                                int i = node.data.Get<List<BossRewardData.Data>>("rewards").IndexOf(_data);
-                                if (checks[i] != -1 && _data.type == BossRewardData.Type.Charm && (_data as BossRewardDataRandomCharm.Data).upgradeName == charm.name)
-                                {
-                                    locations[0] = checks[i];
-                                    //checks[i] = -1;
-                                    break;
-                                }
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                List<int> possibleLocations = ServiceFactory.sessionManager.GetRepeatableLocations('7', ServiceFactory.poolsManager.curTribe);
+                if (possibleLocations.Count == 0)
+                    return;
+                int[] locations = new int[] { possibleLocations.RandomItem() };
                 ServiceFactory.sessionManager.SendLocationsFound(locations);
                 References.PlayerData.inventory.upgrades.Remove(charm);
             }
@@ -290,7 +236,7 @@ namespace Wildfrost_Archipelago.Managers
             List<int> possibleCardChecks = ServiceFactory.sessionManager.GetRepeatableLocations('5', ServiceFactory.poolsManager.curTribe);
             List<int> possibleCharmChecks = ServiceFactory.sessionManager.GetRepeatableLocations('7', ServiceFactory.poolsManager.curTribe);
 
-            int[] checksAdded = { -1, -1, -1, -1, -1, -1, -1 };
+            int[] checksAdded = { -1, -1, -1, -1 };
             SaveCollection<int> checksCollection = new SaveCollection<int>();
             ShopRoutine.Data data = node.campaignNode.data.Get<ShopRoutine.Data>("shopData");
 
@@ -317,7 +263,6 @@ namespace Wildfrost_Archipelago.Managers
                 if ((rand.Next(0, 100) >= 50 || charm == null) && possibleCharmChecks.Count() > 0)
                 {
                     charmsToChange.Add(i, charmName);
-                    checksAdded[4 + i] = possibleCardChecks.TakeRandom();
                     ServiceFactory.poolsManager.ForceAdd(charm, '7');
                 }
                 else if (charm != null)
@@ -375,7 +320,6 @@ namespace Wildfrost_Archipelago.Managers
             if ((rand.Next(0, 100) >= 50 || charm == null) && possibleChecks.Count() > 0)
             {
                 node.campaignNode.data["charm"] = name;
-                node.campaignNode.data["check"] = possibleChecks.TakeRandom();
                 ServiceFactory.poolsManager.ForceAdd(charm, '7');
             }
             else if (charm != null)
@@ -427,7 +371,7 @@ namespace Wildfrost_Archipelago.Managers
             List<int> possibleCardChecks = ServiceFactory.sessionManager.GetRepeatableLocations('5', ServiceFactory.poolsManager.curTribe);
             List<int> possibleCharmChecks = ServiceFactory.sessionManager.GetRepeatableLocations('7', ServiceFactory.poolsManager.curTribe);
 
-            int[] checksAdded = { -1, -1, -1, -1 };
+            int[] checksAdded = { -1 };
             SaveCollection<int> checksCollection = new SaveCollection<int>();
             EventRoutineCharmShop.Data data = node.campaignNode.data.Get<EventRoutineCharmShop.Data>("data");
 
@@ -463,7 +407,6 @@ namespace Wildfrost_Archipelago.Managers
                 if ((rand.Next(0, 100) >= 50 || charm == null) && possibleCharmChecks.Count() > 0)
                 {
                     item.upgradeDataName = charmName;
-                    checksAdded[1 + i] = possibleCardChecks.TakeRandom();
                     ServiceFactory.poolsManager.ForceAdd(charm, '7');
                 }
                 else if (charm != null)
@@ -484,12 +427,10 @@ namespace Wildfrost_Archipelago.Managers
             string name = AssetManager.fullCharmName;
             Random rand = new Random();
             List<int> possibleChecks = ServiceFactory.sessionManager.GetRepeatableLocations('8', ServiceFactory.poolsManager.curTribe);
-            int[] checksAdded = { };
-            SaveCollection<int> checksCollection = new SaveCollection<int>();
-            foreach (object reward in node.campaignNode.data.Get<List<object>>("rewards"))
+            foreach (BossRewardData.Data reward in node.campaignNode.data.Get<CampaignNodeTypeBoss.RewardData>("rewards").rewards)
             {
                 int check = -1;
-                switch ((reward as BossRewardData.Data).type)
+                switch (reward.type)
                 {
                     case BossRewardData.Type.Charm:
                         CardUpgradeData charm = ServiceFactory.poolsManager.PullCharm();
@@ -497,8 +438,6 @@ namespace Wildfrost_Archipelago.Managers
                         if ((rand.Next(0, 100) >= 50 || charm == null) && possibleChecks.Count() > 0)
                         {
                             ((BossRewardDataRandomCharm.Data)reward).upgradeName = name;
-                            check  = possibleChecks.TakeRandom();
-                            ServiceFactory.poolsManager.ForceAdd(charm, '7');
                         }
                         else if (charm != null)
                             ((BossRewardDataRandomCharm.Data)reward).upgradeName = charm.name;
@@ -514,14 +453,11 @@ namespace Wildfrost_Archipelago.Managers
                     default:
                         break;
                 }
-                checksAdded = checksAdded.Append(check).ToArray();
             }
-            checksCollection.collection = checksAdded;
-            node.campaignNode.data.Add("checks", checksCollection);
             node.campaignNode.data.Add("AP_mod", true);
 
         }
-        private void Events_OnBattleWin()
+        private async void Events_OnBattleWin()
         {
             if (!Campaign.FindCharacterNode(References.Player).type.isBattle)
                 return;
@@ -533,6 +469,11 @@ namespace Wildfrost_Archipelago.Managers
             }
             if (locations.Length > 0)
                 ServiceFactory.sessionManager.SendLocationsFound(locations);
+            if (battleName == "Final Battle")
+            {
+                await Task.Delay(16);
+                ServiceFactory.sessionManager.SetGoalAchieved();
+            }
         }
         private void Events_OnEntityKilled(Entity entity, DeathType type)
         {

@@ -101,6 +101,11 @@ namespace Wildfrost_Archipelago.Archipelago
             throw new NotImplementedException();
         }
 
+        public void SetGoalAchieved()
+        {
+            throw new NotImplementedException();
+        }
+
         private static readonly Dictionary<string, object> MockOptions = new Dictionary<string, object>
         {
             {"goal", 0},

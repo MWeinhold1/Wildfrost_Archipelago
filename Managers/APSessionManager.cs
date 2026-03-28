@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Diagnostics;
 using Wildfrost_Archipelago.Constants;
 using Wildfrost_Archipelago.Interfaces;
 
@@ -26,7 +27,6 @@ namespace Wildfrost_Archipelago.Archipelago
         {
             Logger.Log(LogType.Info, $"Starting connection to {uriAndPort}");
             LoginResult result;
-
             try
             {
                 session = ArchipelagoSessionFactory.CreateSession(uriAndPort);
@@ -175,6 +175,11 @@ namespace Wildfrost_Archipelago.Archipelago
         public async Task<Dictionary<long, ScoutedItemInfo>> GetLocationData(int ID)
         {
             return await session.Locations.ScoutLocationsAsync((long)ID);
+        }
+
+        public void SetGoalAchieved()
+        {
+            session.SetGoalAchieved();
         }
     }
 }
