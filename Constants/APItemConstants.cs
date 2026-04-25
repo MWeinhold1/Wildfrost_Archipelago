@@ -128,6 +128,8 @@ namespace Wildfrost_Archipelago.Constants
             {40000, new APItem(40000, 30, "Event 1", "Shade Sculptor")},
             {40001, new APItem(40001, 30, "Event 2", "Charm Merchant")},
             {40002, new APItem(40002, 30, "Event 3", "Gnome Merchant")},
+            {40003, new APItem(40003, 30, "Event 4", "Muncher") },
+            {40004, new APItem(40004, 30, "Event 5", "Blingsnail Cave") },
         };
 
         public static Dictionary<long, APItem> CommonItems = new Dictionary<long, APItem>

@@ -2,6 +2,7 @@
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.Models;
+using Deadpan.Enums.Engine.Components.Modding;
 using HarmonyLib;
 using Microsoft.Win32;
 using System;
@@ -22,6 +23,17 @@ namespace Wildfrost_Archipelago.Archipelago
         private const string gameName = "Wildfrost";
         private ArchipelagoSession session;
         private List<string> RewardsToUndo = new List<string>(){};
+        public Dictionary<string, object> SlotData;
+        /* keys
+            "goal"
+            "excluded_idols"
+            "bypass_town_order"
+            "bypass_building_order"
+            "bell_sanity"
+            "fight_gating"
+            "fight_rando"
+            "wave_rando"
+         */
 
         public bool StartSession(string uriAndPort, string slotName, string password)
         {
@@ -68,8 +80,25 @@ namespace Wildfrost_Archipelago.Archipelago
             SaveSystem.SaveProgressData<bool>("tutorialTownDone", true);
             Events.OnChallengeCompletedSaved += InterceptChallenge;
 
+            slotdata = session.DataStorage.GetSlotData(session.Players.ActivePlayer.Slot);
+
             MetaprogressionSystem.Remove<string, string>("pets", "Wolfie", null);
             MetaprogressionSystem.Add<string, string>("pets", "Wolfie", "Pet 0");
+
+            UnlockData snowdwellersUnlock = new UnlockData();
+            snowdwellersUnlock.name = "Tribe 0";
+            AddressableLoader.AddToGroup<UnlockData>("UnlockData", snowdwellersUnlock);
+
+            ClassData snowdwellers = AddressableLoader.Get<ClassData>("ClassData", "Basic");
+            snowdwellers.requiresUnlock = snowdwellersUnlock;
+
+            UnlockData muncherUnlock = new UnlockData();
+            muncherUnlock.name = "Event 4";
+            AddressableLoader.AddToGroup<UnlockData>("UnlockData", muncherUnlock);
+
+            UnlockData blingsnailUnlock = new UnlockData();
+            blingsnailUnlock.name = "Event 5";
+            AddressableLoader.AddToGroup<UnlockData>("UnlockData", blingsnailUnlock);
 
             foreach (ChallengeData chal in ChallengeSystem.GetAllChallenges())
             {
@@ -91,7 +120,6 @@ namespace Wildfrost_Archipelago.Archipelago
                 if (!list.Contains(chal.name))
                 {
                     list.Add(chal.name);
-                    MetaprogressionSystem.Set(chal.name, true);
                     SaveSystem.SaveProgressData<List<string>>("completedChallenges", list);
                 }
             }
@@ -155,9 +183,9 @@ namespace Wildfrost_Archipelago.Archipelago
             SendLocationsFound(new int[]{ APLocationConstants.GetLocationIDFromName(chal.name)});
             RewardsToUndo.Add(chal.reward.name);
             if (!awaitingUndo)
-                UndoChallenge();
+                UndoReward();
         }
-        public async void UndoChallenge()
+        public async void UndoReward()
         {
             awaitingUndo = true;
             await Task.Delay(16);

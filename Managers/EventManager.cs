@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using UnityEngine.Localization;
 using UnityEngine.Localization.SmartFormat.Utilities;
 using UnityEngine.Localization.Tables;
+using Wildfrost_Archipelago.Archipelago;
 using Wildfrost_Archipelago.Constants;
 using static ES3;
 using static Mono.Security.X509.X520;
@@ -469,7 +470,12 @@ namespace Wildfrost_Archipelago.Managers
             }
             if (locations.Length > 0)
                 ServiceFactory.sessionManager.SendLocationsFound(locations);
-            if (battleName == "Final Battle")
+            if (battleName == "Final Battle" && (ServiceFactory.sessionManager as APSessionManager).SlotData.Get<int>("goal") == 0)
+            {
+                await Task.Delay(16);
+                ServiceFactory.sessionManager.SetGoalAchieved();
+            }
+            else if (battleName == "Final Final Battle" && (ServiceFactory.sessionManager as APSessionManager).SlotData.Get<int>("goal") == 1)
             {
                 await Task.Delay(16);
                 ServiceFactory.sessionManager.SetGoalAchieved();
