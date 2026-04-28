@@ -1,6 +1,8 @@
 ﻿using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Helpers;
+using Archipelago.MultiClient.Net.MessageLog.Messages;
+using Archipelago.MultiClient.Net.MessageLog.Parts;
 using Archipelago.MultiClient.Net.Models;
 using Deadpan.Enums.Engine.Components.Modding;
 using HarmonyLib;
@@ -22,11 +24,10 @@ namespace Wildfrost_Archipelago.Archipelago
     {
         private const string gameName = "Wildfrost";
         private ArchipelagoSession session;
-        private List<string> RewardsToUndo = new List<string>(){};
+        private List<string> RewardsToUndo = new List<string>() { };
         public Dictionary<string, object> SlotData;
         /* keys
             "goal"
-            "excluded_idols"
             "bypass_town_order"
             "bypass_building_order"
             "bell_sanity"
@@ -72,6 +73,9 @@ namespace Wildfrost_Archipelago.Archipelago
             session.Items.ItemReceived += ItemReceived;
             ServiceFactory.poolsManager.UpdatePools(GetAllReceivedItems());
 
+            session.MessageLog.OnMessageReceived += OnMessageReceived;
+            Application.wantsToQuit += EndSession;
+
             await Task.Delay(16);
             WildfrostArchipelago.SwitchToSaveProfile(uriAndPort + "_" + slotName);
             await Task.Delay(16);
@@ -80,7 +84,7 @@ namespace Wildfrost_Archipelago.Archipelago
             SaveSystem.SaveProgressData<bool>("tutorialTownDone", true);
             Events.OnChallengeCompletedSaved += InterceptChallenge;
 
-            slotdata = session.DataStorage.GetSlotData(session.Players.ActivePlayer.Slot);
+            SlotData = session.DataStorage.GetSlotData(session.Players.ActivePlayer.Slot);
 
             MetaprogressionSystem.Remove<string, string>("pets", "Wolfie", null);
             MetaprogressionSystem.Add<string, string>("pets", "Wolfie", "Pet 0");
@@ -102,30 +106,56 @@ namespace Wildfrost_Archipelago.Archipelago
 
             foreach (ChallengeData chal in ChallengeSystem.GetAllChallenges())
             {
+                if (chal.name.Contains("Hot Spring") || chal.name.Contains("Icebreakers") || chal.name.Contains("Inventors Hut") || chal.name.Contains("Pet House"))
+                {
+                    if (!SlotData.Get<bool>("bypass_town_order"))
+                        continue;
+                }
+                else if (!chal.name.StartsWith("Challenge Charm")) //Challenge Companion X, Challenge Item X, Challenge Event X, Challenge Pet X
+                {
+                    if (!SlotData.Get<bool>("bypass_building_order"))
+                        continue;
+                }
                 chal.requires = new ChallengeData[] { };
                 chal.hidden = false;
             }
+            //Finds challenges that aren't locations and marks them as complete
+            List<ChallengeData> challengeLocationsToIgnore = ChallengeSystem.GetAllChallenges().ToList().Where(a => !session.Locations.AllLocations.Contains(APLocationConstants.GetLocationIDFromName(a.name))).ToList();
 
             await Task.Delay(16);
-            // AUTO-COMPLETING ALREADY COMPLETED LOCATIONS IN CASE OF GAME COMPLETIONS OR NEW CLIENT SAVES
             List<string> list = SaveSystem.LoadProgressData<List<string>>("completedChallenges", null) ?? new List<string>();
             await Task.Delay(16);
+
+            foreach (ChallengeData chal in challengeLocationsToIgnore)
+            {
+                if (!list.Contains(chal.name))
+                    list.Add(chal.name);
+            }
+
+            // AUTO-COMPLETING ALREADY COMPLETED LOCATIONS IN CASE OF GAME COMPLETIONS OR NEW CLIENT SAVES
             foreach (long id in session.Locations.AllLocationsChecked)
             {
                 if (id.ToString()[0] == '3' || id.ToString()[0] == '4' || id.ToString()[0] == '5' || id.ToString()[0] == '6' || id.ToString()[0] == '7')
                     //Don't do anything if its a kill location or a repeatable ID since it won't align with anything anyway
                     continue;
                 APLocation loc = APLocationConstants.LocationReferences[(int)id];
-                ChallengeData chal = AddressableLoader.Get<ChallengeData>("ChallengeData", loc.internalName);
-                if (!list.Contains(chal.name))
-                {
-                    list.Add(chal.name);
-                    SaveSystem.SaveProgressData<List<string>>("completedChallenges", list);
-                }
+                ChallengeData chal;
+                if (!AddressableLoader.TryGet<ChallengeData>("ChallengeData", loc.internalName, out chal))
+                    //failsafe
+                    continue;
+                if (!list.Contains(loc.internalName))
+                    list.Add(loc.internalName);
             }
+            SaveSystem.SaveProgressData<List<string>>("completedChallenges", list);
             Logger.Log(LogType.Info, $"Successful connection to {uriAndPort}");
+        }
 
-
+        private void OnMessageReceived(LogMessage message)
+        {
+            foreach (MessagePart part in message.Parts)
+            {
+                Logger.Log(LogType.Info, "MESSAGE PART RECEIVED: " + part.Text);
+            }
         }
 
         public string GetLocationName(int APID) => session.Locations.GetLocationNameFromId(APID);
@@ -137,30 +167,64 @@ namespace Wildfrost_Archipelago.Archipelago
             return list;
         }
 
-        public List<APLocation> GetAllRemainingLocations() { throw new NotImplementedException(); }
+        public List<APLocation> GetAllRemainingLocations() {
+            List<APLocation> list = new List<APLocation>();
+            foreach (long id in session.Locations.AllMissingLocations)
+                list.Add(APLocationConstants.LocationReferences[(int)id]);
+            return list;
+        }
 
-        public void EndSession() { throw new NotImplementedException(); }
+        public bool EndSession() {
+            session.Socket.DisconnectAsync();
+            Application.wantsToQuit -= EndSession;
+            return true;
+        }
 
         public bool CheckWinCon() { throw new NotImplementedException(); }
 
         public void ReceiveItemCallback() { throw new NotImplementedException(); }
 
-        public void SendLocationsFound(int[] locationIDs)
+        public async void SendLocationsFound(int[] locationIDs)
         {
             foreach (int ID in locationIDs)
             {
                 //session.Locations.GetLocationIdFromName("Wildfrost", APLocationConstants.LocationReferences[ID].localDescription);
                 Logger.Log(LogType.Info, "Sending location " + ID.ToString());
-                session.Locations.CompleteLocationChecksAsync((long)ID);
+                await session.Locations.CompleteLocationChecksAsync((long)ID);
+                if (SlotData.Get<int>("goal") == 2)
+                {
+                    List<long> list = new List<long>();
+                    //list of all snowdwell challenges
+                    foreach (int id in APLocationConstants.LocationReferences.Keys.Where(a => a < 30000 && session.Locations.AllLocations.Contains(Convert.ToInt64(a))))
+                        list.Add(Convert.ToInt64(id));
+                    if (session.Locations.AllLocationsChecked.ContainsAll(list))
+                    {
+                        await Task.Delay(16);
+                        SetGoalAchieved();
+                    }
+                }
+                ScoutedItemInfo item = session.Locations.ScoutLocationsAsync((long)ID).Result.Values.First();
+                if (PromptSystem.Prompt.active)
+                    await waitUntilPromptHidden(item);
+                PromptSystem.SetTextAction(() => "Sent " + item.ItemDisplayName + " to " + item.Player);// Player.Alias;
+                await Task.Delay(2000);
+                PromptSystem.Hide();
             }
         }
 
         public void SendDeath() { throw new NotImplementedException(); }
-        private void ItemReceived(ReceivedItemsHelper helper)
+
+        private async void ItemReceived(ReceivedItemsHelper helper)
         {
             ItemInfo item = helper.DequeueItem();
             Logger.Log(LogType.Info, "Receiving item of id " + item.ItemId.ToString());
-            ServiceFactory.poolsManager.UpdatePools(new List<APItem>() { APItemConstants.GetItem(item.ItemId)});
+            ServiceFactory.poolsManager.UpdatePools(new List<APItem>() { APItemConstants.GetItem(item.ItemId) });
+
+            if (PromptSystem.Prompt.active)
+                await waitUntilPromptHidden(item);
+            PromptSystem.SetTextAction(() => "Received " + item.ItemDisplayName + " from " + item.Player);// Player.Alias;
+            await Task.Delay(2000);
+            PromptSystem.Hide();
         }
         
         public List<int> GetRepeatableLocations(char type, char tribe)
@@ -208,6 +272,22 @@ namespace Wildfrost_Archipelago.Archipelago
         public void SetGoalAchieved()
         {
             session.SetGoalAchieved();
+        }
+
+
+        List<object> promptQueue;
+        async Task waitUntilPromptHidden(object item)
+        {
+            if (promptQueue.Contains(item))
+                return;
+            promptQueue.Add(item);
+            while (promptQueue.Count > 1 && promptQueue[0] != item)
+                await Task.Delay(16);
+            await Task.Delay(16);
+            while (PromptSystem.Prompt.active)
+                await Task.Delay(16);
+            promptQueue.Remove(item);
+            return;
         }
     }
 }

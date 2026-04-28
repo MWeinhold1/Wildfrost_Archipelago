@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using UnityEngine.TextCore;
 using UnityEngine.Localization;
 using UnityEngine.Localization.SmartFormat.Utilities;
 using UnityEngine.Localization.Tables;
@@ -60,6 +61,8 @@ namespace Wildfrost_Archipelago.Managers
             if (!routine.node.data.ContainsKey("checks") || !routine.node.data.ContainsKey("entitiesToChange"))
                 return;
             int[] checks = routine.node.data.Get<SaveCollection<int>>("checks").collection;
+            if (checks.Length == 0)
+                return;
             int i = 0;
             foreach (CardData card in routine.node.data.Get<List<CardData>>("entitiesToChange"))
             {
@@ -192,6 +195,19 @@ namespace Wildfrost_Archipelago.Managers
         private void Events_OnCampaignStart()
         {
             ServiceFactory.poolsManager.PopulatePools();
+
+            foreach (CampaignNode node in References.Campaign.nodes)
+            {
+                if (node.type.isBattle)
+                {
+                    BattleData battleData;
+                    node.data = new Dictionary<string, object>
+                    {
+                        ["battle"] = battleData.name,
+                        ["waves"] = battleData.generationScript.Run(battleData, 0)
+                    };
+                }
+            }
         }
 
         #region Utility Functions
@@ -462,7 +478,8 @@ namespace Wildfrost_Archipelago.Managers
         {
             if (!Campaign.FindCharacterNode(References.Player).type.isBattle)
                 return;
-            string battleName = Campaign.FindCharacterNode(References.Player).data.Get<string>("battle");
+            CampaignNode battleNode = Campaign.FindCharacterNode(References.Player);
+            string battleName = battleNode.data.Get<string>("battle");
             int[] locations = { };
             foreach (APLocation loc in  APLocationConstants.LocationReferences.Values.Where(location => location.internalName == battleName))
             {
@@ -479,6 +496,24 @@ namespace Wildfrost_Archipelago.Managers
             {
                 await Task.Delay(16);
                 ServiceFactory.sessionManager.SetGoalAchieved();
+            }
+            //battleTier is between 0 and 8
+            //areaIndex is between 0 and 2
+
+            //is 1 or 3 (Fights. Fights and Acts)
+            APSessionManager manager = (ServiceFactory.sessionManager as APSessionManager);
+            if (manager.SlotData.Get<int>("fight_gating") % 2 != 0)
+            {
+                int maxTier = manager.GetAllReceivedItems().Where(item => item.displayName == "Progressive Fight").Count();
+                if (battleNode.tier >= maxTier)
+                    References.Campaign.End(Campaign.Result.Restart);
+            }
+            //is 2 or 3 (Acts. Fights and Acts)
+            if (manager.SlotData.Get<int>("fight_gating") >= 2)
+            {
+                int maxArea = manager.GetAllReceivedItems().Where(item => item.displayName == "Progressive Act").Count();
+                if (battleNode.areaIndex >= maxArea)
+                    References.Campaign.End(Campaign.Result.Restart);
             }
         }
         private void Events_OnEntityKilled(Entity entity, DeathType type)

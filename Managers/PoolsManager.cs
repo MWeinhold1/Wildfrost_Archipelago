@@ -75,41 +75,44 @@ namespace Wildfrost_Archipelago.Managers
             foreach (APItem item in list)
             {
                 Logger.Log(LogType.Info,"Processing item of ID " + item.APID);
-                if (!ProcessedItems.Contains(item) || item.type == APItemType.trap_boon)
+                UnlockData unlock;
+                switch (item.type)
                 {
-                    UnlockData unlock;
-                    switch (item.type)
-                    {
-                        case APItemType.building:
-                            unlock = AddressableLoader.Get<UnlockData>("UnlockData", item.internalName);
-                            UnlocksToSave.Add(unlock.name);
+                    case APItemType.building:
+                        unlock = AddressableLoader.Get<UnlockData>("UnlockData", item.internalName);
+                        UnlocksToSave.Add(unlock.name);
+                        break;
+                    case APItemType.tribe:
+                        unlock = AddressableLoader.Get<UnlockData>("UnlockData", item.internalName);
+                        UnlocksToSave.Add(unlock.name);
+                        break;
+                    case APItemType.pet:
+                        unlock = AddressableLoader.Get<UnlockData>("UnlockData", item.internalName);
+                        UnlocksToSave.Add(unlock.name);
+                        break;
+                    case APItemType.bell:
+                        if (Campaign.instance != null)
+                            AddToPool(item);
+                        break;
+                    case APItemType.trap_boon:
+                        break;
+                    case APItemType.progressive:
+                        break;
+                    default:
+                        if (AllItems.Contains(item))
                             break;
-                        case APItemType.tribe:
-                            unlock = AddressableLoader.Get<UnlockData>("UnlockData", item.internalName);
-                            UnlocksToSave.Add(unlock.name);
-                            break;
-                        case APItemType.pet:
-                            unlock = AddressableLoader.Get<UnlockData>("UnlockData", item.internalName);
-                            UnlocksToSave.Add(unlock.name);
-                            break;
-                        case APItemType.bell:
-                            if (Campaign.instance != null)
-                                AddToPool(item);
-                            break;
-                        case APItemType.trap_boon:
-                            break;
-                        default:
-                            if (AllItems.Contains(item))
-                                break;
-                            AllItems.Add(item);
-                            if (Campaign.instance != null)
-                                AddToTribe(item);
-                            else
-                                ItemsToAddOnLoad.Add(item);
-                            break;
-                    }
-                    ProcessedItems.Add(item);
+                        AllItems.Add(item);
+                        if (Campaign.instance != null)
+                            AddToTribe(item);
+                        else
+                            ItemsToAddOnLoad.Add(item);
+                        break;
                 }
+                ProcessedItems.Add(item);
+                //condition no longer needed because processed items isn't saved, and is instead always taking from "all processed items" on load and from "item received" mid-game.
+                //if (!ProcessedItems.Contains(item) || item.type == APItemType.trap_boon || item.displayName.StartsWith("Progressive"))
+                //{
+                //}
             }
             if (UnlocksToSave.Count > 0)
                 SaveUnlock();

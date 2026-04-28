@@ -54,7 +54,7 @@ namespace Wildfrost_Archipelago.Archipelago
 
         public List<APLocation> GetAllRemainingLocations() { throw new NotImplementedException(); }
 
-        public void EndSession() { throw new NotImplementedException(); }
+        public bool EndSession() { throw new NotImplementedException(); }
 
         public bool CheckWinCon() { throw new NotImplementedException(); }
 
