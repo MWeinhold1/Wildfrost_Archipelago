@@ -12,7 +12,7 @@ namespace Wildfrost_Archipelago.Interfaces
     {
         bool StartSession(string uriAndPort, string slotName, string password);
 
-        void EndSession();
+        bool EndSession();
 
         bool CheckWinCon();
 

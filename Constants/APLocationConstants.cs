@@ -57,7 +57,7 @@ namespace Wildfrost_Archipelago.Constants
     {
         public static int GetLocationIDFromName(string name)
         {
-            return LocationReferences.Where(a => a.Value.internalName == name).First().Key;
+            return LocationReferences.Any(a => a.Value.internalName == name) ? LocationReferences.Where(a => a.Value.internalName == name).First().Key : -1;
         }
         public static Dictionary<int, APLocation> LocationReferences = new Dictionary<int, APLocation>
         {
@@ -183,7 +183,7 @@ namespace Wildfrost_Archipelago.Constants
             {30060, new APLocation(30060, 3, "WoollyDrek", "Kill Woolly Drek")},
             // Gnome
             {30061, new APLocation(30061, 3, "NakedGnome", "Kill Naked Gnome")},
-            {30062, new APLocation(30062, 3, "", "Kill ArchipelaGnome")},
+            {30062, new APLocation(30062, 3, "", "Kill ArchipelaGnome")}, //I don't think we need this, we can just have the archipelagnome option give you a hint when you spare a gnome
             // Clunkers
             {30063, new APLocation(30063, 3, "Vimik", "Kill Bombarder")},
             {30064, new APLocation(30064, 3, "IceForge", "Kill Ice Forge")},
@@ -217,7 +217,7 @@ namespace Wildfrost_Archipelago.Constants
             {40019, new APLocation(40019, 4, "Clunker Boss", "Kill Krunker")},
             {40020, new APLocation(40020, 4, "Toadstool Boss", "Kill Truffle")},
             {40021, new APLocation(40021, 4, "Final Boss", "Kill Frost Guardian")},
-            {40022, new APLocation(40022, 4, "Final Final Boss", "Kill Frost Bomber")},
+            {40022, new APLocation(40022, 4, "Final Final Boss", "Kill Frost Bomber")}, //TODO: redo this with the actual entity names since the vanquish bosses dont have phases
             {40023, new APLocation(40023, 4, "Final Final Boss", "Kill Frost Crusher")},
             {40024, new APLocation(40024, 4, "Final Final Boss", "Kill Frost Jailer")},
             {40025, new APLocation(40025, 4, "Final Final Boss", "Kill Frost Junker")},

@@ -28,6 +28,7 @@ namespace Wildfrost_Archipelago.Managers
         public void LoadEvents()
         {
             Logger.Log(LogType.Info, "Loading Events");
+            Events.OnSceneLoaded += Events_OnSceneLoaded;
             Events.OnCampaignStart += Events_OnCampaignStart;
             Events.OnMapNodeSelect += Events_OnMapNodeSelect;
             Events.OnCardDataCreated += Events_OnCardDataCreated;
@@ -38,9 +39,22 @@ namespace Wildfrost_Archipelago.Managers
             Events.OnEntityKilled += Events_OnEntityKilled;
         }
 
+        private void Events_OnSceneLoaded(UnityEngine.SceneManagement.Scene scene)
+        {
+            if (Town.instance != null)
+            {
+                Building[] array = Town.FindObjectsOfType<Building>(includeInactive: true);
+                foreach (Building building in array)
+                {
+                    building.uncheckedUnlocks = null;
+                }
+            }
+        }
+
         public void UnloadEvents()
         {
             Logger.Log(LogType.Info, "Unloading Events");
+            Events.OnSceneLoaded -= Events_OnSceneLoaded;
             Events.OnCampaignStart -= Events_OnCampaignStart;
             Events.OnMapNodeSelect -= Events_OnMapNodeSelect;
             Events.OnCardDataCreated -= Events_OnCardDataCreated;
@@ -49,6 +63,9 @@ namespace Wildfrost_Archipelago.Managers
             Events.OnEventPopulated -= Events_OnEventPopulated;
             Events.OnBattleWin -= Events_OnBattleWin;
             Events.OnEntityKilled -= Events_OnEntityKilled;
+           
+            //if ((ServiceFactory.sessionManager as APSessionManager).SlotData != null && (ServiceFactory.sessionManager as APSessionManager).SlotData.Get<long>("fights_in_pool") != 0)
+            //    Events.OnPreCampaignPopulate -= Events_OnPreCampaignPopulate;
         }
 
         public async void Events_OnEventPopulated(EventRoutine routine)
@@ -195,20 +212,29 @@ namespace Wildfrost_Archipelago.Managers
         private void Events_OnCampaignStart()
         {
             ServiceFactory.poolsManager.PopulatePools();
-
-            foreach (CampaignNode node in References.Campaign.nodes)
-            {
-                if (node.type.isBattle)
-                {
-                    BattleData battleData;
-                    node.data = new Dictionary<string, object>
-                    {
-                        ["battle"] = battleData.name,
-                        ["waves"] = battleData.generationScript.Run(battleData, 0)
-                    };
-                }
-            }
         }
+
+        /*public void Events_OnPreCampaignPopulate()
+        {
+            List<BattleLockData> locks = new List<BattleLockData>();
+            foreach (BattleData battle in AddressableLoader.GetGroup<BattleData>("BattleData"))
+            {
+                // Checking if semi-vanilla is enabled and cancelling if the fight is not a vanilla-locked fight
+                if ((ServiceFactory.sessionManager as APSessionManager).SlotData.Get<long>("fights_in_pool") == 1)
+                {
+                    if (battle.name != "BabyBerries" && battle.name != "Bombers" && battle.name != "Shroomers" && battle.name != "Spikers" && battle.name != "Inkers" && battle.name != "Mimiks")
+                        continue;
+                }
+                ChallengeData chal = new ChallengeData();
+                chal.name = battle.name;
+
+                BattleLockData lockData = new BattleLockData();
+                lockData.battleName = battle.name;
+                lockData.linkToChallenge = chal;
+                locks.Add(lockData);
+            }
+            Campaign.Data.GameMode.populator.battleLockers = locks.ToArray();
+        }*/
 
         #region Utility Functions
         private void ManageItemNode(MapNode node)
@@ -487,12 +513,12 @@ namespace Wildfrost_Archipelago.Managers
             }
             if (locations.Length > 0)
                 ServiceFactory.sessionManager.SendLocationsFound(locations);
-            if (battleName == "Final Battle" && (ServiceFactory.sessionManager as APSessionManager).SlotData.Get<int>("goal") == 0)
+            if (battleName == "Final Battle" && (ServiceFactory.sessionManager as APSessionManager).SlotData.Get<long>("goal") == 0)
             {
                 await Task.Delay(16);
                 ServiceFactory.sessionManager.SetGoalAchieved();
             }
-            else if (battleName == "Final Final Battle" && (ServiceFactory.sessionManager as APSessionManager).SlotData.Get<int>("goal") == 1)
+            else if (battleName == "Final Final Battle" && (ServiceFactory.sessionManager as APSessionManager).SlotData.Get<long>("goal") == 1)
             {
                 await Task.Delay(16);
                 ServiceFactory.sessionManager.SetGoalAchieved();
@@ -502,14 +528,14 @@ namespace Wildfrost_Archipelago.Managers
 
             //is 1 or 3 (Fights. Fights and Acts)
             APSessionManager manager = (ServiceFactory.sessionManager as APSessionManager);
-            if (manager.SlotData.Get<int>("fight_gating") % 2 != 0)
+            if (manager.SlotData.Get<long>("fight_gating") % 2 != 0)
             {
                 int maxTier = manager.GetAllReceivedItems().Where(item => item.displayName == "Progressive Fight").Count();
                 if (battleNode.tier >= maxTier)
                     References.Campaign.End(Campaign.Result.Restart);
             }
             //is 2 or 3 (Acts. Fights and Acts)
-            if (manager.SlotData.Get<int>("fight_gating") >= 2)
+            if (manager.SlotData.Get<long>("fight_gating") >= 2)
             {
                 int maxArea = manager.GetAllReceivedItems().Where(item => item.displayName == "Progressive Act").Count();
                 if (battleNode.areaIndex >= maxArea)

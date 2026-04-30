@@ -10,7 +10,9 @@ using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using Wildfrost_Archipelago.Managers;
 using static UnityEngine.Rendering.DebugUI;
-
+using HarmonyLib;
+using Wildfrost_Archipelago.Archipelago;
+using UnityEngine.SocialPlatforms;
 
 namespace Wildfrost_Archipelago
 {
@@ -193,6 +195,31 @@ namespace Wildfrost_Archipelago
         //    TraitData q;
         //    UnlockData r;
         //}
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(CampaignPopulator), nameof(CampaignPopulator.BattleIsLocked))]
+        public bool BattleIsAPLocked(bool __result, string battleName)
+        {
+            if ((ServiceFactory.sessionManager as APSessionManager).SlotData != null)
+            {
+                if ((ServiceFactory.sessionManager as APSessionManager).SlotData.Get<long>("fights_in_pool") == 0)
+                {
+                    return true;
+                }
+                // Checking if semi-vanilla is enabled and cancelling if the fight is not a vanilla-locked fight
+                if ((ServiceFactory.sessionManager as APSessionManager).SlotData.Get<long>("fights_in_pool") == 1)
+                {
+                    if (battleName != "BabyBerries" && battleName != "Bombers" && battleName != "Shroomers" && battleName != "Spikers" && battleName != "Inkers" && battleName != "Mimiks")
+                    {
+                        __result = true;
+                        return false;
+                    }
+                }
+                __result = ServiceFactory.sessionManager.GetAllReceivedItems().Any(item => item.internalName == battleName);
+                return false;
+            }
+            return true;
+        }
     }
 
     public static class Logger

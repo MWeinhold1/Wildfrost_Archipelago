@@ -29,6 +29,7 @@ namespace Wildfrost_Archipelago.Constants
         tribe = 20,
         pet = 30,
         map_event = 40,
+        battle = 41,
         common_item = 50,
         snow_item = 51,
         shade_item = 52,
@@ -42,7 +43,8 @@ namespace Wildfrost_Archipelago.Constants
         shade_charm = 72,
         clunk_charm = 73,
         bell = 80,
-        trap_boon = 90
+        trap_boon = 90,
+        progressive = 99
     }
 
     public static class APItemConstants
@@ -61,6 +63,8 @@ namespace Wildfrost_Archipelago.Constants
                     return APItemConstants.Pets[id];
                 case "40":
                     return APItemConstants.MapEvents[id];
+                case "41":
+                    return APItemConstants.Battles[id];
                 case "50":
                     return APItemConstants.CommonItems[id];
                 case "51":
@@ -125,11 +129,37 @@ namespace Wildfrost_Archipelago.Constants
 
         public static Dictionary<long, APItem> MapEvents = new Dictionary<long, APItem>
         {
-            {40000, new APItem(40000, 30, "Event 1", "Shade Sculptor")},
-            {40001, new APItem(40001, 30, "Event 2", "Charm Merchant")},
-            {40002, new APItem(40002, 30, "Event 3", "Gnome Merchant")},
-            {40003, new APItem(40003, 30, "Event 4", "Muncher") },
-            {40004, new APItem(40004, 30, "Event 5", "Blingsnail Cave") },
+            {40000, new APItem(40000, 40, "Event 1", "Shade Sculptor")},
+            {40001, new APItem(40001, 40, "Event 2", "Charm Merchant")},
+            {40002, new APItem(40002, 40, "Event 3", "Gnome Merchant")},
+            {40004, new APItem(40004, 40, "Event 4", "Muncher")},
+            {40005, new APItem(40005, 40, "Event 5", "Blingsnail Cave")},
+        };
+        public static Dictionary<long, APItem> Battles = new Dictionary<long, APItem>
+        {
+            {41000, new APItem(41000, 41, "Pengoons", "The Pengoons")},
+            {41001, new APItem(41001, 41, "Snowbos", "The Snowbo Squad")},
+            {41002, new APItem(41002, 41, "BabyBerries", "The Bog Berries")},
+            {41004, new APItem(41004, 41, "Bombers", "The Snow Lumps")},
+            {41005, new APItem(41005, 41, "Berries", "The Globerries")},
+            {41006, new APItem(41006, 41, "Frosters", "The Frost Shades")},
+            {41007, new APItem(41007, 41, "Shroomers", "The Noxious Shrooms")},
+            {41008, new APItem(41008, 41, "Yeti", "The Snowland Bears")},
+            {41009, new APItem(41009, 41, "Frenzy Boss", "Infernoko")},
+            {41010, new APItem(41010, 41, "Split Boss", "Bamboozle")},
+            {41011, new APItem(41011, 41, "Goats", "The Demonhorn Goats")},
+            {41012, new APItem(41012, 41, "Husks", "The Shelled Husks")},
+            {41013, new APItem(41013, 41, "Spice Monkeys", "The Spice Mokos")},
+            {41014, new APItem(41014, 41, "Drek", "The Wooly Drek")},
+            {41015, new APItem(41015, 41, "Spikers", "The Toothy Shades")},
+            {41016, new APItem(41016, 41, "Inkers", "The Ink Sacks")},
+            {41017, new APItem(41017, 41, "Clunker Boss", "Krunker")},
+            {41018, new APItem(41018, 41, "Toadstool Boss", "Truffle")},
+            {41019, new APItem(41019, 41, "Blockers", "The Ice Krabs")},
+            {41020, new APItem(41020, 41, "Wildlings", "The Wild Hogs")},
+            {41021, new APItem(41021, 41, "Mimiks", "The Gunk Bugs")},
+            {41022, new APItem(41022, 41, "Final Boss", "Eye of the Storm")},
+            {41023, new APItem(41023, 41, "Final Final Boss", "Heart of the Storm")},
         };
 
         public static Dictionary<long, APItem> CommonItems = new Dictionary<long, APItem>
@@ -159,9 +189,6 @@ namespace Wildfrost_Archipelago.Constants
             {50022, new APItem(50022, 50, "Mimik", "Mimik")},
             {50023, new APItem(50023, 50, "TotemOfTheGoat", "Totem of the Goat")},
             {50024, new APItem(50024, 50, "ZoomlinNest", "Zoomlin Nest")},
-            {50025, new APItem(50025, 50, "BrokenVase", "Broken Vase")},
-            {50026, new APItem(50026, 50, "LuminSealant", "Lumin Goop")},
-            {50027, new APItem(50027, 50, "LuminVase", "The Lumin Vase")},
         };
 
         public static Dictionary<long, APItem> SnowItems = new Dictionary<long, APItem>
@@ -459,6 +486,14 @@ namespace Wildfrost_Archipelago.Constants
             {90013, new APItem(90013, 90, "", "Minion Death Trap")},
             {90014, new APItem(90014, 90, "", "Throwing Shade Trap")},
             {90015, new APItem(90015, 90, "", "Cursed Crown Trap")},
+        };
+        public static Dictionary<long, APItem> ProgressiveItems = new Dictionary<long, APItem>
+        {
+            {99999, new APItem(99999, 99, "", "Progressive Act")},
+            {99998, new APItem(99998, 99, "", "Progressive Fight")},
+            {99997, new APItem(99997, 99, "BrokenVase", "Broken Vase")},
+            {99996, new APItem(99996, 99, "LuminSealant", "Lumin Goop")},
+            {99995, new APItem(99995, 99, "LuminVase", "The Lumin Vase")},
         };
     }
 }

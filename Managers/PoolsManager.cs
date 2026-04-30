@@ -94,6 +94,9 @@ namespace Wildfrost_Archipelago.Managers
                         if (Campaign.instance != null)
                             AddToPool(item);
                         break;
+                    case APItemType.battle:
+                        SaveChallenge(item.internalName);
+                        break;
                     case APItemType.trap_boon:
                         break;
                     case APItemType.progressive:
@@ -266,6 +269,13 @@ namespace Wildfrost_Archipelago.Managers
             UnlocksToSave.Clear();
             SaveSystem.SaveProgressData<List<string>>("townNew", list2);
             SaveSystem.SaveProgressData<List<string>>("unlocked", list3);
+        }
+        public async void SaveChallenge(string name)
+        {
+            await Task.Delay(16);
+            List<string> list = SaveSystem.LoadProgressData<List<string>>("completedChallenges", null) ?? new List<string>();
+            list.Add(name);
+            SaveSystem.SaveProgressData<List<string>>("completedChallenges", list);
         }
     }
 }

@@ -33,8 +33,15 @@ namespace Wildfrost_Archipelago.Archipelago
             "bell_sanity"
             "fight_gating"
             "fight_rando"
+            "fights_in_pool"
             "wave_rando"
          */
+
+        //TODOS: Account for no battles being in a given battle pool
+        //add fight_rando and wave_rando stuff
+        //add bell_sanity stuff
+        //test everything
+        //add archipelagnome stuff
 
         public bool StartSession(string uriAndPort, string slotName, string password)
         {
@@ -70,8 +77,6 @@ namespace Wildfrost_Archipelago.Archipelago
 
         public async void InitializeSession(string uriAndPort, string slotName)
         {
-            session.Items.ItemReceived += ItemReceived;
-            ServiceFactory.poolsManager.UpdatePools(GetAllReceivedItems());
 
             session.MessageLog.OnMessageReceived += OnMessageReceived;
             Application.wantsToQuit += EndSession;
@@ -80,11 +85,20 @@ namespace Wildfrost_Archipelago.Archipelago
             WildfrostArchipelago.SwitchToSaveProfile(uriAndPort + "_" + slotName);
             await Task.Delay(16);
 
+            session.Items.ItemReceived += ItemReceived;
+            ServiceFactory.poolsManager.UpdatePools(GetAllReceivedItems());
+
+            await Task.Delay(16);
+
             SaveSystem.SaveProgressData<int>("tutorialProgress", 2);
             SaveSystem.SaveProgressData<bool>("tutorialTownDone", true);
             Events.OnChallengeCompletedSaved += InterceptChallenge;
 
             SlotData = session.DataStorage.GetSlotData(session.Players.ActivePlayer.Slot);
+
+            //if ((ServiceFactory.sessionManager as APSessionManager).SlotData.Get<long>("fights_in_pool") != 0)
+            //    Events.OnPreCampaignPopulate += ServiceFactory.eventManager.Events_OnPreCampaignPopulate;
+            SelectStartingPet
 
             MetaprogressionSystem.Remove<string, string>("pets", "Wolfie", null);
             MetaprogressionSystem.Add<string, string>("pets", "Wolfie", "Pet 0");
@@ -108,12 +122,12 @@ namespace Wildfrost_Archipelago.Archipelago
             {
                 if (chal.name.Contains("Hot Spring") || chal.name.Contains("Icebreakers") || chal.name.Contains("Inventors Hut") || chal.name.Contains("Pet House"))
                 {
-                    if (!SlotData.Get<bool>("bypass_town_order"))
+                    if (SlotData.Get<long>("bypass_town_order") != 1)
                         continue;
                 }
                 else if (!chal.name.StartsWith("Challenge Charm")) //Challenge Companion X, Challenge Item X, Challenge Event X, Challenge Pet X
                 {
-                    if (!SlotData.Get<bool>("bypass_building_order"))
+                    if (SlotData.Get<long>("bypass_building_order") != 1)
                         continue;
                 }
                 chal.requires = new ChallengeData[] { };
@@ -191,7 +205,7 @@ namespace Wildfrost_Archipelago.Archipelago
                 //session.Locations.GetLocationIdFromName("Wildfrost", APLocationConstants.LocationReferences[ID].localDescription);
                 Logger.Log(LogType.Info, "Sending location " + ID.ToString());
                 await session.Locations.CompleteLocationChecksAsync((long)ID);
-                if (SlotData.Get<int>("goal") == 2)
+                if (SlotData.Get <long>("goal") == 2)
                 {
                     List<long> list = new List<long>();
                     //list of all snowdwell challenges
