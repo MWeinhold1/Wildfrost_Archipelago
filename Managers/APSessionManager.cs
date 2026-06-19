@@ -7,6 +7,7 @@ using Archipelago.MultiClient.Net.Models;
 using Deadpan.Enums.Engine.Components.Modding;
 using HarmonyLib;
 using Microsoft.Win32;
+using NaughtyAttributes.Test;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -82,8 +83,38 @@ namespace Wildfrost_Archipelago.Archipelago
             Application.wantsToQuit += EndSession;
 
             await Task.Delay(16);
-            WildfrostArchipelago.SwitchToSaveProfile(uriAndPort + "_" + slotName);
+            await WildfrostArchipelago.SwitchToSaveProfile(uriAndPort + "_" + slotName);
             await Task.Delay(16);
+
+            MetaprogressionSystem.Remove<string, string>("pets", "Wolfie", null);
+            MetaprogressionSystem.Add<string, string>("pets", "Wolfie", "Pet 0");
+
+            UnlockData snoofUnlock = AddressableLoader.Get<UnlockData>("UnlockData", "Pet 1").InstantiateKeepName();
+            snoofUnlock.name = "Pet 0";
+            snoofUnlock.unlockDesc = null;
+            snoofUnlock.unlockTitle = null;
+            AddressableLoader.AddToGroup<UnlockData>("UnlockData", snoofUnlock);
+
+            UnlockData snowdwellersUnlock = AddressableLoader.Get<UnlockData>("UnlockData", "Tribe 1").InstantiateKeepName();
+            snowdwellersUnlock.name = "Tribe 0";
+            snowdwellersUnlock.unlockDesc = null;
+            snowdwellersUnlock.unlockTitle = null;
+            AddressableLoader.AddToGroup<UnlockData>("UnlockData", snowdwellersUnlock);
+
+            ClassData snowdwellers = AddressableLoader.Get<ClassData>("ClassData", "Basic");
+            snowdwellers.requiresUnlock = snowdwellersUnlock;
+
+            UnlockData muncherUnlock = AddressableLoader.Get<UnlockData>("UnlockData", "Event 1").InstantiateKeepName();
+            muncherUnlock.name = "Event 4";
+            muncherUnlock.unlockDesc = null;
+            muncherUnlock.unlockTitle = null;
+            AddressableLoader.AddToGroup<UnlockData>("UnlockData", muncherUnlock);
+
+            UnlockData blingsnailUnlock = AddressableLoader.Get<UnlockData>("UnlockData", "Event 1").InstantiateKeepName();
+            blingsnailUnlock.name = "Event 5";
+            blingsnailUnlock.unlockDesc = null;
+            blingsnailUnlock.unlockTitle = null;
+            AddressableLoader.AddToGroup<UnlockData>("UnlockData", blingsnailUnlock);
 
             session.Items.ItemReceived += ItemReceived;
             ServiceFactory.poolsManager.UpdatePools(GetAllReceivedItems());
@@ -98,26 +129,6 @@ namespace Wildfrost_Archipelago.Archipelago
 
             //if ((ServiceFactory.sessionManager as APSessionManager).SlotData.Get<long>("fights_in_pool") != 0)
             //    Events.OnPreCampaignPopulate += ServiceFactory.eventManager.Events_OnPreCampaignPopulate;
-            SelectStartingPet
-
-            MetaprogressionSystem.Remove<string, string>("pets", "Wolfie", null);
-            MetaprogressionSystem.Add<string, string>("pets", "Wolfie", "Pet 0");
-
-            UnlockData snowdwellersUnlock = new UnlockData();
-            snowdwellersUnlock.name = "Tribe 0";
-            AddressableLoader.AddToGroup<UnlockData>("UnlockData", snowdwellersUnlock);
-
-            ClassData snowdwellers = AddressableLoader.Get<ClassData>("ClassData", "Basic");
-            snowdwellers.requiresUnlock = snowdwellersUnlock;
-
-            UnlockData muncherUnlock = new UnlockData();
-            muncherUnlock.name = "Event 4";
-            AddressableLoader.AddToGroup<UnlockData>("UnlockData", muncherUnlock);
-
-            UnlockData blingsnailUnlock = new UnlockData();
-            blingsnailUnlock.name = "Event 5";
-            AddressableLoader.AddToGroup<UnlockData>("UnlockData", blingsnailUnlock);
-
             foreach (ChallengeData chal in ChallengeSystem.GetAllChallenges())
             {
                 if (chal.name.Contains("Hot Spring") || chal.name.Contains("Icebreakers") || chal.name.Contains("Inventors Hut") || chal.name.Contains("Pet House"))
@@ -194,9 +205,14 @@ namespace Wildfrost_Archipelago.Archipelago
             return true;
         }
 
-        public bool CheckWinCon() { throw new NotImplementedException(); }
+        public bool CheckWinCon() { 
+            Debug.Log("Checking Win Con");
+            return false;
+        }
 
-        public void ReceiveItemCallback() { throw new NotImplementedException(); }
+        public void ReceiveItemCallback() {
+            Debug.Log("Received Item Callback");
+        }
 
         public async void SendLocationsFound(int[] locationIDs)
         {
@@ -209,24 +225,40 @@ namespace Wildfrost_Archipelago.Archipelago
                 {
                     List<long> list = new List<long>();
                     //list of all snowdwell challenges
-                    foreach (int id in APLocationConstants.LocationReferences.Keys.Where(a => a < 30000 && session.Locations.AllLocations.Contains(Convert.ToInt64(a))))
-                        list.Add(Convert.ToInt64(id));
-                    if (session.Locations.AllLocationsChecked.ContainsAll(list))
+                    if (APLocationConstants.LocationReferences.Keys.Where(a => a < 30000 && session.Locations.AllLocations.Contains(Convert.ToInt64(a))).Count() <= 0)
+                        Logger.Log(LogType.Info, "ITS NOT WORKING DUMMY");
+                    else
                     {
-                        await Task.Delay(16);
-                        SetGoalAchieved();
+                        foreach (int id in APLocationConstants.LocationReferences.Keys.Where(a => a < 30000 && session.Locations.AllLocations.Contains(Convert.ToInt64(a))))
+                            list.Add(Convert.ToInt64(id));
+                        if (session.Locations.AllLocationsChecked.ContainsAll(list))
+                        {
+                            await Task.Delay(16);
+                            SetGoalAchieved();
+                        }
                     }
                 }
-                ScoutedItemInfo item = session.Locations.ScoutLocationsAsync((long)ID).Result.Values.First();
+                Dictionary<long, ScoutedItemInfo> scoutDicts = await session.Locations.ScoutLocationsAsync((long)ID);
+                if (scoutDicts.Count() == 0)
+                {
+                    Logger.Log(LogType.Info, "WHY IS IT NOT WORKING AAAAAAAAAAAA");
+                    continue;
+                }
+                ScoutedItemInfo[] items = scoutDicts.Values.ToArray();
+                ScoutedItemInfo item = items.First();
                 if (PromptSystem.Prompt.active)
                     await waitUntilPromptHidden(item);
-                PromptSystem.SetTextAction(() => "Sent " + item.ItemDisplayName + " to " + item.Player);// Player.Alias;
+                PromptSystem.Create(Prompt.Anchor.TopRight, 0, 0, 5);
+                string name = item.Player.Name != null ? (item.Player.Alias != null ? item.Player.Alias + " (" + item.Player.Name + ")" : item.Player.Name) : item.Player.Slot.ToString();
+                PromptSystem.SetTextAction(() => "Sent " + item.ItemDisplayName + " to " + name + " (" + item.LocationDisplayName + ")");
                 await Task.Delay(2000);
                 PromptSystem.Hide();
             }
         }
 
-        public void SendDeath() { throw new NotImplementedException(); }
+        public void SendDeath() {
+            Debug.Log("Receiving Death link");
+        }
 
         private async void ItemReceived(ReceivedItemsHelper helper)
         {
@@ -234,9 +266,12 @@ namespace Wildfrost_Archipelago.Archipelago
             Logger.Log(LogType.Info, "Receiving item of id " + item.ItemId.ToString());
             ServiceFactory.poolsManager.UpdatePools(new List<APItem>() { APItemConstants.GetItem(item.ItemId) });
 
+            if (item.Player.ToString() != "Server")
             if (PromptSystem.Prompt.active)
                 await waitUntilPromptHidden(item);
-            PromptSystem.SetTextAction(() => "Received " + item.ItemDisplayName + " from " + item.Player);// Player.Alias;
+            PromptSystem.Create(Prompt.Anchor.TopRight, 0, 0, 5);
+            string name = item.Player.Name != null ? (item.Player.Alias != null ? item.Player.Alias + " (" + item.Player.Name + ")" : item.Player.Name) : item.Player.Slot.ToString();
+            PromptSystem.SetTextAction(() => "Received " + item.ItemDisplayName + " from " + name);
             await Task.Delay(2000);
             PromptSystem.Hide();
         }
@@ -267,6 +302,7 @@ namespace Wildfrost_Archipelago.Archipelago
         {
             awaitingUndo = true;
             await Task.Delay(16);
+            await Task.Delay(16);
             List<string> list2 = SaveSystem.LoadProgressData<List<string>>("townNew", null) ?? new List<string>();
             List<string> list3 = SaveSystem.LoadProgressData<List<string>>("unlocked", null) ?? new List<string>();
             foreach (string name in RewardsToUndo) { 
@@ -274,6 +310,7 @@ namespace Wildfrost_Archipelago.Archipelago
                 list3.Remove(name);
             }
             RewardsToUndo.Clear();
+            await Task.Delay(16);
             SaveSystem.SaveProgressData<List<string>>("townNew", list2);
             SaveSystem.SaveProgressData<List<string>>("unlocked", list3);
             awaitingUndo = false;
@@ -289,7 +326,7 @@ namespace Wildfrost_Archipelago.Archipelago
         }
 
 
-        List<object> promptQueue;
+        List<object> promptQueue = new List<object>();
         async Task waitUntilPromptHidden(object item)
         {
             if (promptQueue.Contains(item))
@@ -298,7 +335,7 @@ namespace Wildfrost_Archipelago.Archipelago
             while (promptQueue.Count > 1 && promptQueue[0] != item)
                 await Task.Delay(16);
             await Task.Delay(16);
-            while (PromptSystem.Prompt.active)
+            while (PromptSystem.Prompt != null && PromptSystem.Prompt.active)
                 await Task.Delay(16);
             promptQueue.Remove(item);
             return;

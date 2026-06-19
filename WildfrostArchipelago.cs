@@ -13,6 +13,7 @@ using static UnityEngine.Rendering.DebugUI;
 using HarmonyLib;
 using Wildfrost_Archipelago.Archipelago;
 using UnityEngine.SocialPlatforms;
+using System.Threading.Tasks;
 
 namespace Wildfrost_Archipelago
 {
@@ -101,17 +102,22 @@ namespace Wildfrost_Archipelago
         }
 
         // Code from Snowfall by Jacorb
-        public static void SwitchToSaveProfile(string switchTo, bool copyFiles = false)
+        public async static Task SwitchToSaveProfile(string switchTo, bool copyFiles = false)
         {
             var lastMods = SaveSystem.LoadProgressData<string[]>("lastSavedMods");
+            await Task.Delay(16);
+            SaveSystem.SaveProgressData<string[]>("lastSavedMods", lastMods);
             oldProfile = SaveSystem.GetProfile();
+            await Task.Delay(16);
             SaveSystem.SetProfile(switchTo);
             SaveSystem.folderName = SaveSystem.profileFolder + "/" + switchTo;
             if (SaveSystem.Enabled)
             {
                 Events.InvokeSaveSystemProfileChanged();
             }
+            await Task.Delay(16);
             SaveSystem.SaveProgressData<string[]>("lastSavedMods", lastMods);
+            return;
 
             //var loadFrom = SaveSystem.profileFolder + "/Default";
             //var dir = Directory.GetParent(SaveSystem.settings.FullPath);

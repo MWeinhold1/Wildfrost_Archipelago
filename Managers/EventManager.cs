@@ -290,7 +290,7 @@ namespace Wildfrost_Archipelago.Managers
                 if ((rand.Next(0, 100) >= 50 || item == null) && possibleCardChecks.Count() > 0)
                 {
                     card.cardDataName = itemName;
-                    checksAdded[0] = possibleCardChecks.TakeRandom();
+                    checksAdded[i] = possibleCardChecks.TakeRandom();
                     ServiceFactory.poolsManager.ForceAdd(item, '5');
                 }
                 else if (item != null)
@@ -547,7 +547,7 @@ namespace Wildfrost_Archipelago.Managers
             if (entity.owner == Battle.GetOpponent(References.Player))
             {
                 if (APLocationConstants.LocationReferences.Values.Where(location => location.internalName == entity.data.name).Count() > 0)
-                    ServiceFactory.sessionManager.SendLocationsFound(new int[]{APLocationConstants.LocationReferences.Values.Single(location => location.internalName == entity.data.name).id});
+                    ServiceFactory.sessionManager.SendLocationsFound(new int[]{APLocationConstants.LocationReferences.Values.Where(location => location.internalName == entity.data.name).First().id});
             }
         }
 
@@ -555,7 +555,7 @@ namespace Wildfrost_Archipelago.Managers
         {
             Logger.Log(LogType.Info, text);
             PromptSystem.Prompt.SetText(text);
-            PromptSystem.Create(Prompt.Anchor.Mid, 0, 0, 3, Prompt.Emote.Type.Basic, Prompt.Emote.Position.Above);
+            PromptSystem.Create(Prompt.Anchor.TopRight, 0, 0, 5, Prompt.Emote.Type.Basic, Prompt.Emote.Position.Above);
         }
         #endregion
     }
